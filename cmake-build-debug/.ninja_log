@@ -1,0 +1,12 @@
+# ninja log v5
+0	56	6853926691756880	CMakeFiles/fund_algs.dir/lab_1/task_1.c.obj	911b92ddd9dc1d13
+0	91	6853931894400781	build.ninja	eb2cc54aad09f86f
+0	44	6853930618842304	CMakeFiles/task_7.dir/lab_1/task_7.c.obj	ac30ffd0c9ec8ef
+56	105	6853926692226249	fund_algs.exe	a3f065ee3e41c950
+1	50	6853929818867894	CMakeFiles/aaa.dir/lab_1/task_7.c.obj	c6051ab2c3ef5e31
+51	106	6853929819415665	aaa.exe	5b4d5c58534c7983
+0	54	6853930436667185	CMakeFiles/task_1.dir/lab_1/task_1.c.obj	353e499f949a9e6b
+54	99	6853930437094262	task_1.exe	1628464d7fcaa593
+44	85	6853930619230813	task_7.exe	e9c7cd8701fd30ed
+0	52	6853932026459888	CMakeFiles/task_2.dir/lab_1/task_2.c.obj	fbd39bdd3c2a390d
+52	96	6853932026873988	task_2.exe	da1ad12ef0f71075

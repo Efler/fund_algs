@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "fund_algs",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "task_1::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-task_1-Debug-101fff49d42d7951bc2f.json",
+					"name" : "task_1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "task_2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-task_2-Debug-96756e6c9b325ffc4dab.json",
+					"name" : "task_2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "task_7::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-task_7-Debug-936bf549c12d141f1c37.json",
+					"name" : "task_7",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug",
+		"source" : "D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
