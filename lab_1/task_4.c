@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 
 int re_all(char** buff, char** p_buff, int* k){
@@ -29,8 +29,6 @@ char* dynamic_string(int* k){
 
 int main(int argc, char *argv[]){
 
-//    char fin_path[] = "D:\\JetBrains\\CLion 2022.2.3\\CLionProjects\\fund_algs\\lab_1\\tester_task_7.txt";
-//    char ftmp_path[] = "D:\\JetBrains\\CLion 2022.2.3\\CLionProjects\\fund_algs\\lab_1\\tester_task_7.txt";
 
     char* buff1;
     char* buff2;
@@ -42,19 +40,36 @@ int main(int argc, char *argv[]){
     int k = 16;
 
 
-    if(argc != 1){
+    if(argc != 2){
         printf("Input Error: wrong number of arguments\n");
         return 0;
     }
-    FILE* fin = fopen("D:\\JetBrains\\CLion 2022.2.3\\CLionProjects\\fund_algs\\lab_1\\tester_task_7.txt", "r");
+
+
+    char ftmp_name[] = "tmp.txt";
+    int i = strlen(argv[1]) - 1;
+    for(; argv[1][i] != '\\'; i--);
+    i += 2;
+    char* str_path = dynamic_string(&i);
+    i -= 1;
+    *(str_path + i) = 0;
+    strncpy(str_path, argv[1], i);
+    strcat(str_path, ftmp_name);
+
+
+    FILE* fin = fopen(argv[1], "r");
     if(!fin){
         printf("File Error: could not open file\n");
+        remove(str_path);
+        free(str_path);
         return 0;
     }
-    FILE* ftmp = fopen("D:\\JetBrains\\CLion 2022.2.3\\CLionProjects\\fund_algs\\lab_1\\tmp.txt", "w");
+    FILE* ftmp = fopen(str_path, "w");
     if(!ftmp){
         printf("File Error: could not create a temporary file\n");
         fclose(fin);
+        remove(str_path);
+        free(str_path);
         return 0;
     }
 
@@ -68,6 +83,8 @@ int main(int argc, char *argv[]){
             free(buff1);
             fclose(fin);
             fclose(ftmp);
+            remove(str_path);
+            free(str_path);
             return 0;
         }
         p_buff1 = buff1 + 1;
@@ -79,6 +96,8 @@ int main(int argc, char *argv[]){
                     free(buff1);
                     fclose(fin);
                     fclose(ftmp);
+                    remove(str_path);
+                    free(str_path);
                     return 0;
                 }
                 if ((p_buff1 - buff1) == k) {
@@ -87,6 +106,8 @@ int main(int argc, char *argv[]){
                         free(buff1);
                         fclose(fin);
                         fclose(ftmp);
+                        remove(str_path);
+                        free(str_path);
                         return 0;
                     }
                 }
@@ -108,6 +129,8 @@ int main(int argc, char *argv[]){
             free(buff2);
             fclose(fin);
             fclose(ftmp);
+            remove(str_path);
+            free(str_path);
             return 0;
         }
         p_buff2 = buff2 + 1;
@@ -120,6 +143,8 @@ int main(int argc, char *argv[]){
                     free(buff2);
                     fclose(fin);
                     fclose(ftmp);
+                    remove(str_path);
+                    free(str_path);
                     return 0;
                 }
                 if ((p_buff2 - buff2) == k) {
@@ -129,6 +154,8 @@ int main(int argc, char *argv[]){
                         free(buff2);
                         fclose(fin);
                         fclose(ftmp);
+                        remove(str_path);
+                        free(str_path);
                         return 0;
                     }
                 }
@@ -142,6 +169,7 @@ int main(int argc, char *argv[]){
         c = 0;
 
 
+
         buff3 = dynamic_string(&k);
         if(buff3 == 0){
             printf("Malloc Error\n");
@@ -150,6 +178,8 @@ int main(int argc, char *argv[]){
             free(buff3);
             fclose(fin);
             fclose(ftmp);
+            remove(str_path);
+            free(str_path);
             return 0;
         }
         p_buff3 = buff3 + 1;
@@ -163,6 +193,8 @@ int main(int argc, char *argv[]){
                     free(buff3);
                     fclose(fin);
                     fclose(ftmp);
+                    remove(str_path);
+                    free(str_path);
                     return 0;
                 }
                 if(c==EOF){
@@ -174,6 +206,8 @@ int main(int argc, char *argv[]){
                             free(buff3);
                             fclose(fin);
                             fclose(ftmp);
+                            remove(str_path);
+                            free(str_path);
                             return 0;
                         }
                     }
@@ -184,6 +218,9 @@ int main(int argc, char *argv[]){
                     free(buff3);
                     fclose(fin);
                     fclose(ftmp);
+                    remove(argv[1]);
+                    rename(str_path, argv[1]);
+                    free(str_path);
                     printf("Done!\n");
                 }else{
                     if ((p_buff3 - buff3) == k) {
@@ -194,6 +231,8 @@ int main(int argc, char *argv[]){
                             free(buff3);
                             fclose(fin);
                             fclose(ftmp);
+                            remove(str_path);
+                            free(str_path);
                             return 0;
                         }
                     }
