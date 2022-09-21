@@ -9,3 +9,5 @@ add_executable(task_7
         lab_1/task_7.c)
 add_executable(task_2
         lab_1/task_2.c)
+add_executable(task_4
+        lab_1/task_4.c)

@@ -139,6 +139,39 @@ build task_2.exe: C_EXECUTABLE_LINKER__task_2_Debug CMakeFiles/task_2.dir/lab_1/
   TARGET_IMPLIB = libtask_2.dll.a
   TARGET_PDB = task_2.exe.dbg
 
+# =============================================================================
+# Object build statements for EXECUTABLE target task_4
+
+
+#############################################
+# Order-only phony target for task_4
+
+build cmake_object_order_depends_target_task_4: phony || CMakeFiles/task_4.dir
+
+build CMakeFiles/task_4.dir/lab_1/task_4.c.obj: C_COMPILER__task_4_Debug D$:/JetBrains/CLion$ 2022.2.3/CLionProjects/fund_algs/lab_1/task_4.c || cmake_object_order_depends_target_task_4
+  DEP_FILE = CMakeFiles\task_4.dir\lab_1\task_4.c.obj.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles\task_4.dir
+  OBJECT_FILE_DIR = CMakeFiles\task_4.dir\lab_1
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target task_4
+
+
+#############################################
+# Link the executable task_4.exe
+
+build task_4.exe: C_EXECUTABLE_LINKER__task_4_Debug CMakeFiles/task_4.dir/lab_1/task_4.c.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\task_4.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = task_4.exe
+  TARGET_IMPLIB = libtask_4.dll.a
+  TARGET_PDB = task_4.exe.dbg
+
 
 #############################################
 # Utility command for edit_cache
@@ -169,6 +202,8 @@ build task_1: phony task_1.exe
 
 build task_2: phony task_2.exe
 
+build task_4: phony task_4.exe
+
 build task_7: phony task_7.exe
 
 # =============================================================================
@@ -179,7 +214,7 @@ build task_7: phony task_7.exe
 #############################################
 # Folder: D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug
 
-build all: phony task_1.exe task_7.exe task_2.exe
+build all: phony task_1.exe task_7.exe task_2.exe task_4.exe
 
 # =============================================================================
 # Built-in targets
