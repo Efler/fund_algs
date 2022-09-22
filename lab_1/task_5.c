@@ -40,7 +40,10 @@ int main(int argc, char *argv[]){
 
 
     if(strcmp(argv[1], "-fi") == 0){
-
+        if(argc != 3){
+            printf("Invalid Input: wrong number of arguments\n");
+            return 0;
+        }
         int count = 0, e = 0;
         char c = 0;
         char c1 = 0;
@@ -50,7 +53,12 @@ int main(int argc, char *argv[]){
 
         char fout_name[] = "result_task_5.txt";
         int i = strlen(argv[2]) - 1;
-        for(; argv[2][i] != '\\'; i--);
+        for(; argv[2][i] != '\\'; i--){
+            if(i == 0){
+                printf("Invalid Input: path error\n");
+                return 0;
+            }
+        }
         i  = i + 2 + 9;
         char* str_path = dynamic_string(&i);
         i -= 1 + 9;
@@ -140,8 +148,11 @@ int main(int argc, char *argv[]){
         free(str_path);
 
 
-
     }else if(strcmp(argv[1], "-cin") == 0){
+        if(argc != 2){
+            printf("Invalid Input: wrong number of arguments\n");
+            return 0;
+        }
         char c = 0, c1 = 0;
         int count = 0;
         int k = 16;
@@ -172,7 +183,12 @@ int main(int argc, char *argv[]){
 
                 char fout_name[] = "result_task_5.txt";
                 int i = strlen(buff) - 1;
-                for(; buff[i] != '\\'; i--);
+                for(; buff[i] != '\\'; i--){
+                    if(i == 0){
+                        printf("Invalid Input: path error\n");
+                        return 0;
+                    }
+                }
                 i  = i + 2 + 9;
                 char* str_path = dynamic_string(&i);
                 i -= 1 + 9;
@@ -227,12 +243,21 @@ int main(int argc, char *argv[]){
 
 
     }else if(strcmp(argv[1], "-arg") == 0){
+        if(argc == 2){
+            printf("Input Error: no arguments\n");
+            return 0;
+        }
         char c = 0;
         int count = 0, e = 0;
 
         char fout_name[] = "result_task_5.txt";
         int i = strlen(argv[2]) - 1;
-        for(; argv[2][i] != '\\'; i--);
+        for(; argv[2][i] != '\\'; i--){
+            if(i == 0){
+                printf("Invalid Input: path error\n");
+                return 0;
+            }
+        }
         i  = i + 2 + 9;
         char* str_path = dynamic_string(&i);
         i -= 1 + 9;
@@ -240,12 +265,14 @@ int main(int argc, char *argv[]){
         strncpy(str_path, argv[2], i);
         strcat(str_path, fout_name);
 
+
         FILE* fout = fopen(str_path, "w");
         if(!fout){
             printf("File Error: could not open file\n");
             free(str_path);
             return 0;
         }
+
 
         for(int s = 2; s<argc; s++){
             if(s == argc-1) e = 1;
