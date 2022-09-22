@@ -56,15 +56,28 @@ int main(int argc, char *argv[]){
         char* buff;
         char* p_buff;
 
+
+        char fout_name[] = "result_task_5.txt";
+        int i = strlen(argv[2]) - 1;
+        for(; argv[2][i] != '\\'; i--);
+        i  = i + 2 + 9;
+        char* str_path = dynamic_string(&i);
+        i -= 1 + 9;
+        *(str_path + i) = 0;
+        strncpy(str_path, argv[2], i);
+        strcat(str_path, fout_name);
+
+
         FILE* fin = fopen(argv[2], "r");
         if(!fin){
             printf("File Error: could not open file\n");
             return 0;
         }
-        FILE* fout = fopen("D:\\JetBrains\\tester_files_(yan)\\result_task_5.txt", "w");
+        FILE* fout = fopen(str_path, "w");
         if(!fout){
             printf("File Error: could not open file\n");
             fclose(fin);
+            free(str_path);
             return 0;
         }
 
@@ -76,6 +89,8 @@ int main(int argc, char *argv[]){
                 printf("Malloc Error\n");
                 fclose(fin);
                 fclose(fout);
+                remove(str_path);
+                free(str_path);
                 return 0;
             }
             p_buff = buff + 1;
@@ -88,6 +103,8 @@ int main(int argc, char *argv[]){
                         free(buff);
                         fclose(fout);
                         fclose(fin);
+                        remove(str_path);
+                        free(str_path);
                         return 0;
                     }
                 }
@@ -96,13 +113,15 @@ int main(int argc, char *argv[]){
                     if(c == EOF) e = 1;
                     *(p_buff-1) = 0;
                     k = 16;
-                    printf("%s\n", buff);
+                    printf("%s ---> ", buff);
                     FILE* fp = fopen(buff, "r");
                     if(!fp){
                         printf("File Error: could not open file\n");
                         fclose(fin);
                         fclose(fout);
                         free(buff);
+                        remove(str_path);
+                        free(str_path);
                         return 0;
                     }
                     while(c1!=EOF){
@@ -126,6 +145,7 @@ int main(int argc, char *argv[]){
         }
         fclose(fin);
         fclose(fout);
+        free(str_path);
         printf("Flag -fi: done!\n");
 
 
