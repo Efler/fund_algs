@@ -145,8 +145,8 @@ int main(int argc, char *argv[]){
         }
         fclose(fin);
         fclose(fout);
+        printf("Flag -fi: done! ---> path: %s\n", str_path);
         free(str_path);
-        printf("Flag -fi: done!\n");
 
 
 
@@ -161,9 +161,39 @@ int main(int argc, char *argv[]){
 
 
     }else if(strcmp(argv[1], "-cin") == 0){
-        printf("Soon...");
+        char stringg[80];
+        while(scanf("%s", stringg)){
+            printf("%s\n", stringg);
+        }
+
+
+
     }else if(strcmp(argv[1], "-arg") == 0){
-        printf("Soon...");
+
+
+        char fout_name[] = "result_task_5.txt";
+        int i = strlen(argv[2]) - 1;
+        for(; argv[2][i] != '\\'; i--);
+        i  = i + 2 + 9;
+        char* str_path = dynamic_string(&i);
+        i -= 1 + 9;
+        *(str_path + i) = 0;
+        strncpy(str_path, argv[2], i);
+        strcat(str_path, fout_name);
+
+
+        FILE* fout = fopen(str_path, "w");
+        if(!fout){
+            printf("File Error: could not open file\n");
+            free(str_path);
+            return 0;
+        }
+
+
+
+
+
+
     }else{
         printf("Invalid Flag: unexpected flag\n");
         return 0;
