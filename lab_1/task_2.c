@@ -1,112 +1,189 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#define EPSILON 1e-5
 
 
-void arg_to_int(int* p_num, char* symbol){
-    char* symbol_1 = symbol;
-    int zn = 1;
-    if(*symbol == '0'){//----------------------------------------------************
-        printf("Invalid Input: unexpected number\n");
-        exit(0);
+int is_right_triangle(float a, float b, float c){
+    float max = a;
+    float min = a;
+    float middle = 0;
+    float arr[3] = {a,b,c};
+    for(int i = 0; i < 3; i++){
+        if(arr[i] > max) max = arr[i];
+        if(arr[i] < min) min = arr[i];
     }
-    while(*symbol){
-        if((((*symbol - '0') < 0) || ((*symbol - '0') > 9))&&(*symbol!='-')){
-            printf("Invalid Input: unexpected number\n");
-            exit(0);
+    for(int i = 0; i < 3; i++){
+        if(arr[i] < max && arr[i] > min) middle = arr[i];
+    }
+    if(fabs(min*min + middle*middle - max*max) < EPSILON){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
+int valid_number(char *s){
+    for(int i = 0; s[i] != '\0'; i++){
+        if ((((s[i] - '0') < 0) || ((s[i] - '0') > 9)) && (s[i] != '.') && (s[i] != '-')) {
+            return 1;
         }
-        if(*symbol=='-'){
-            if(symbol != symbol_1){
-                printf("Invalid Input: unexpected number\n");
-                exit(0);
-            }
-            zn = -1;
-            symbol++;
+    }
+    return 0;
+}
+
+
+int is_multiple(int a, int b){
+    if(a % b == 0){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
+int roots(float a, float b, float c, float* x1, float* x2){
+    if(fabs(a) < EPSILON){
+        return (-1);
+    }
+    float d = b*b - 4*a*c;
+    if(d > EPSILON){
+        *x1 = (b*(-1)+(sqrt(d)))/(2*a);
+        *x2 = (b*(-1)-(sqrt(d)))/(2*a);
+        return 2;
+    }
+    else if(fabs(d) < EPSILON) {
+        *x1 = (-b)/(2*a);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
+float str_to_float(char *s, int* check_float) {
+    int negative = 1, i = 0, findDot = 0;
+    float result = 0, point = 1;
+
+    if(s[0] == '-'){
+        i++;
+        negative = -1;
+    }
+
+    for(; s[i] != '\0'; i++){
+        if(findDot){
+            *check_float = 1;
+            point = point / 10;
+            result = result + (s[i] - '0') * point;
         }else{
-            if(zn == 1){
-                if((*p_num > INT_MAX/10)){
-                    printf("Invalid Number: overflow\n");
-                    exit(0);
-                }
-                if(((*p_num * 10)/2 + (*symbol - '0')/2) > INT_MAX/2){
-                    printf("Invalid Number: overflow\n");
-                    exit(0);
-                }
-                *p_num = *p_num * 10 + (*symbol++ - '0');
+            if(s[i] == '.'){
+                findDot = 1;
             }else{
-                if((*p_num > (INT_MAX/10))){
-                    printf("Invalid Number: overflow\n");
-                    exit(0);
-                }
-                if(((*p_num * 10)/2 + (*symbol - '0')/2) > (INT_MAX/2)){
-                    printf("Invalid Number: overflow\n");
-                    exit(0);
-                }
-                *p_num = *p_num * 10 + (*symbol++ - '0');
+                result = result * 10 + (s[i] - '0');
             }
         }
     }
-    if(zn==-1) *p_num *= zn;
+    return result * negative;
 }
 
-
-void input_validation(int argc, char *argv[]){
-
-    if(argv[1][1] == 'q'){
-//--------------------------------------!!!
-    }
-    else if(argv[1][1] == 'm'){
-        if(argc != 4){
-            printf("Invalid Input (flag 'm'): wrong number of arguments\n");
-            exit(0);
-        }
-        if((strlen(argv[2])==1)&&(argv[2][0]=='0')){
-            printf("Invalid Input (flag 'm'): at least one of the numbers is 0\n");
-            exit(0);
-        }
-        if((strlen(argv[3])==1)&&(argv[3][0]=='0')){
-            printf("Invalid Input (flag 'm'): at least one of the numbers is 0\n");
-            exit(0);
-        }
-
-        int num1 = 0, num2 = 0;//-----------------------------------------------******
-        arg_to_int(&num1, argv[2]);
-        arg_to_int(&num2, argv[3]);
-
-        printf("%d %d",num1,num2);
-
-    }
-    else if(argv[1][1] == 't'){
-//--------------------------------------------------!!!
-    }
-}
 
 
 int main(int argc, char *argv[]){
+    int checker;
+    int check_float = 0;
+    int count = 1;
+    float x1, x2 = 0;
+
     if(argc == 1){
         printf("Invalid Input: no arguments\n");
-        exit(0);
+        return 0;
     }
-    if(argv[1][0] == '-' || argv[1][0] == '/'){
-        if(strlen(argv[1]) != 2){
-            printf("Invalid Input: unexpected flag\n");
-            exit(0);
+    if(strlen(argv[1]) != 2 || (argv[1][0] != '-' && argv[1][0] != '/')){
+        printf("Invalid Input: unexpected flag\n");
+        return 0;
+    }
+    for(int e = 3; e <= argc; e++){
+        if(valid_number(argv[e-1])){
+            printf("Invalid Input: unexpected number\n");
+            return 0;
         }
-        if(argv[1][1] == 'q'){
+    }
+    if(argv[1][1] == 'q'){
+        if(argc != 5){
+            printf("Invalid Input: wrong number of arguments\n");
+            return 0;
+        }
+        float arr[3] = {str_to_float(argv[2], &check_float),str_to_float(argv[3], &check_float),str_to_float(argv[4], &check_float)};
 
+        for (int i = 0; i < 3; i++) {
+            for (int j =0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    if(i!=j && i!=k && j!=k){
+                        checker = roots(arr[i],arr[j],arr[k], &x1, &x2);
+                        if(checker == -1){
+                            printf("%d) %fx^2 + %fx + %f:   invalid quadratic equation coefficient (a = 0)!\n", count, arr[i], arr[j], arr[k]);
+                            count++;
+                        }else if(checker == 0){
+                            printf("%d) %fx^2 + %fx + %f:   no roots!\n", count, arr[i], arr[j], arr[k]);
+                            count++;
+                        }else if(checker == 1){
+                            printf("%d) %fx^2 + %fx + %f:   x = %f\n", count, arr[i], arr[j], arr[k], x1);
+                            count++;
+                        }else if(checker == 2){
+                            printf("%d) %fx^2 + %fx + %f:   x1 = %f; x2 = %f\n", count, arr[i], arr[j], arr[k], x1, x2);
+                            count++;
+                        }
+                    }
+                }
+            }
         }
-        else if(argv[1][1] == 'm'){
-            input_validation(argc,argv);
+        return 0;
+    }
+    else if(argv[1][1] == 'm'){
+        if(argc != 4){
+            printf("Invalid Input: wrong number of arguments\n");
+            return 0;
         }
-        else if(argv[1][1] == 't'){
-
+        int a = str_to_float(argv[2], &check_float);
+        int b = str_to_float(argv[3], &check_float);
+        if(check_float){
+            printf("Flag -m error: at least one number is not integer\n");
+            return 0;
         }
-        else{
-            printf("Invalid Flag: unexpected flag '%c'\n", argv[1][1]);
-            exit(0);
+        if(a == 0 || b == 0){
+            printf("Flag -m error: at least one number is 0\n");
+            return 0;
+        }
+        if(is_multiple(a,b)){
+            printf("Yes, it is multiple\n");
+            return 0;
+        }else{
+            printf("No, it is not multiple\n");
+            return 0;
+        }
+    }else if(argv[1][1] == 't'){
+        if(argc != 5){
+            printf("Invalid Input: wrong number of arguments\n");
+            return 0;
+        }
+        if(fabs(str_to_float(argv[2], &check_float)) < EPSILON || fabs(str_to_float(argv[3], &check_float)) < EPSILON || fabs(str_to_float(argv[4], &check_float)) < EPSILON){
+            printf("Flag -t error: at least one number is 0\n");
+            return 0;
+        }else if(str_to_float(argv[2], &check_float) > EPSILON || str_to_float(argv[3], &check_float) > EPSILON || str_to_float(argv[4], &check_float) > EPSILON){
+            if(is_right_triangle(str_to_float(argv[2], &check_float), str_to_float(argv[3], &check_float), str_to_float(argv[4], &check_float))){
+                printf("Yes, it can be a right triangle\n");
+                return 0;
+            }else{
+                printf("No, it can't be a right triangle\n");
+                return 0;
+            }
+        }else{
+            printf("No, it can't be a right triangle\n");
+            return 0;
         }
     }else{
-        printf("Invalid Input: symbol '-' or '/' before flag not found\n");
-        exit(0);
+        printf("Invalid Input: unexpected flag\n");
+        return 0;
     }
 }
