@@ -19,7 +19,8 @@
 						1,
 						2,
 						3,
-						4
+						4,
+						5
 					]
 				}
 			],
@@ -38,7 +39,8 @@
 						1,
 						2,
 						3,
-						4
+						4,
+						5
 					]
 				}
 			],
@@ -56,6 +58,13 @@
 					"id" : "task_2::@6890427a1f51a3e7e1df",
 					"jsonFile" : "target-task_2-Debug-96756e6c9b325ffc4dab.json",
 					"name" : "task_2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "task_3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-task_3-Debug-00242667b29403ec851d.json",
+					"name" : "task_3",
 					"projectIndex" : 0
 				},
 				{
