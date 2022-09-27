@@ -238,6 +238,39 @@ build task_3.exe: C_EXECUTABLE_LINKER__task_3_Debug CMakeFiles/task_3.dir/lab_1/
   TARGET_IMPLIB = libtask_3.dll.a
   TARGET_PDB = task_3.exe.dbg
 
+# =============================================================================
+# Object build statements for EXECUTABLE target task_8
+
+
+#############################################
+# Order-only phony target for task_8
+
+build cmake_object_order_depends_target_task_8: phony || CMakeFiles/task_8.dir
+
+build CMakeFiles/task_8.dir/lab_1/task_8.c.obj: C_COMPILER__task_8_Debug D$:/JetBrains/CLion$ 2022.2.3/CLionProjects/fund_algs/lab_1/task_8.c || cmake_object_order_depends_target_task_8
+  DEP_FILE = CMakeFiles\task_8.dir\lab_1\task_8.c.obj.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles\task_8.dir
+  OBJECT_FILE_DIR = CMakeFiles\task_8.dir\lab_1
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target task_8
+
+
+#############################################
+# Link the executable task_8.exe
+
+build task_8.exe: C_EXECUTABLE_LINKER__task_8_Debug CMakeFiles/task_8.dir/lab_1/task_8.c.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\task_8.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = task_8.exe
+  TARGET_IMPLIB = libtask_8.dll.a
+  TARGET_PDB = task_8.exe.dbg
+
 
 #############################################
 # Utility command for edit_cache
@@ -276,6 +309,8 @@ build task_5: phony task_5.exe
 
 build task_7: phony task_7.exe
 
+build task_8: phony task_8.exe
+
 # =============================================================================
 # Folder targets.
 
@@ -284,7 +319,7 @@ build task_7: phony task_7.exe
 #############################################
 # Folder: D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug
 
-build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe
+build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe task_8.exe
 
 # =============================================================================
 # Built-in targets

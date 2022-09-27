@@ -15,3 +15,5 @@ add_executable(task_5
         lab_1/task_5.c)
 add_executable(task_3
         lab_1/task_3.c)
+add_executable(task_8
+        lab_1/task_8.c)
