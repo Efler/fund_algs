@@ -32,7 +32,6 @@ int str_to_int(char* buff){
 }
 
 int main(int argc, char *argv[]){
-    int arr[128];
     char c = 0, cp = 0;
     int action;
     char* buff;
