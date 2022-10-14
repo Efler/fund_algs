@@ -337,6 +337,39 @@ build l2_task_2.exe: C_EXECUTABLE_LINKER__l2_task_2_Debug CMakeFiles/l2_task_2.d
   TARGET_IMPLIB = libl2_task_2.dll.a
   TARGET_PDB = l2_task_2.exe.dbg
 
+# =============================================================================
+# Object build statements for EXECUTABLE target l2_task_4
+
+
+#############################################
+# Order-only phony target for l2_task_4
+
+build cmake_object_order_depends_target_l2_task_4: phony || CMakeFiles/l2_task_4.dir
+
+build CMakeFiles/l2_task_4.dir/lab_2/l2_task_4.c.obj: C_COMPILER__l2_task_4_Debug D$:/JetBrains/CLion$ 2022.2.3/CLionProjects/fund_algs/lab_2/l2_task_4.c || cmake_object_order_depends_target_l2_task_4
+  DEP_FILE = CMakeFiles\l2_task_4.dir\lab_2\l2_task_4.c.obj.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles\l2_task_4.dir
+  OBJECT_FILE_DIR = CMakeFiles\l2_task_4.dir\lab_2
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target l2_task_4
+
+
+#############################################
+# Link the executable l2_task_4.exe
+
+build l2_task_4.exe: C_EXECUTABLE_LINKER__l2_task_4_Debug CMakeFiles/l2_task_4.dir/lab_2/l2_task_4.c.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\l2_task_4.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = l2_task_4.exe
+  TARGET_IMPLIB = libl2_task_4.dll.a
+  TARGET_PDB = l2_task_4.exe.dbg
+
 
 #############################################
 # Utility command for edit_cache
@@ -367,6 +400,8 @@ build l2_task_1: phony l2_task_1.exe
 
 build l2_task_2: phony l2_task_2.exe
 
+build l2_task_4: phony l2_task_4.exe
+
 build task_1: phony task_1.exe
 
 build task_2: phony task_2.exe
@@ -389,7 +424,7 @@ build task_8: phony task_8.exe
 #############################################
 # Folder: D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug
 
-build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe task_8.exe l2_task_1.exe l2_task_2.exe
+build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe task_8.exe l2_task_1.exe l2_task_2.exe l2_task_4.exe
 
 # =============================================================================
 # Built-in targets
