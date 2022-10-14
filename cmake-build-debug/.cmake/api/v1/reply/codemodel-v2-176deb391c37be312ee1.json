@@ -24,7 +24,8 @@
 						6,
 						7,
 						8,
-						9
+						9,
+						10
 					]
 				}
 			],
@@ -48,7 +49,8 @@
 						6,
 						7,
 						8,
-						9
+						9,
+						10
 					]
 				}
 			],
@@ -73,6 +75,13 @@
 					"id" : "l2_task_4::@6890427a1f51a3e7e1df",
 					"jsonFile" : "target-l2_task_4-Debug-6ffbfbf71b6142f6a02a.json",
 					"name" : "l2_task_4",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "l2_task_5::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l2_task_5-Debug-a03dfbc788a8fda21c2a.json",
+					"name" : "l2_task_5",
 					"projectIndex" : 0
 				},
 				{
