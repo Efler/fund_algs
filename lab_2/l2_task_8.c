@@ -2,7 +2,7 @@
 #include <math.h>
 
 double f(double x) {
-    return x -4 - 5 * (sin(x));
+    return x - 4 + 5 * (cos(x));
 }
 
 double dihotomia(double (*f)(double), double a, double b, int accur) {
@@ -19,5 +19,5 @@ double dihotomia(double (*f)(double), double a, double b, int accur) {
 }
 
 int main() {
-    printf("\nX: %lf\n", dihotomia(f, (double)1.1, (double)3.5, 7));
+    printf("\nX: %lf\n", dihotomia(f, (double)1.0, (double)5.0, 10));
 }
