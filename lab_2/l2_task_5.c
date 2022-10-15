@@ -47,7 +47,7 @@ int main(int argc, char *argv[]){
             if(arr[i] > arr[max]) max = i;
             if(arr[i] < arr[min]) min = i;
         }
-        swap(&arr[max], &arr[min]);
+        swap(&arr[max], &arr[min]); // arr + max
         printf("\nSwapped min and max:\n");
         for(int i = 0; i < size; i++){
             printf("%d ", arr[i]);
