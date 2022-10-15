@@ -5,6 +5,12 @@
 
 
 double func_power(double num, int power){
+    if(num == 0 && power >= 1){
+        return 0;
+    }
+    else if(num == 0){
+        return NAN;
+    }
     if(num == 1){
         return 1;
     }
