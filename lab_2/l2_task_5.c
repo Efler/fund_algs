@@ -28,6 +28,11 @@ int main(int argc, char *argv[]){
     printf("b:");
     scanf("%d", &b);
 
+    if(a>b){
+        printf("\nThe range is invalid, swapping a and b\n");
+        swap(&a, &b);
+    }
+
     printf("\nGenerated array:\n");
     for(int i = 0; i < size; i++){
         arr[i] = rand() % (b - a + 1) + a;
