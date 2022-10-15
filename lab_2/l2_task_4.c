@@ -5,6 +5,9 @@
 
 
 double func_power(double num, int power){
+    if(num == 1){
+        return 1;
+    }
     if(power == 0){
         return 1;
     }
