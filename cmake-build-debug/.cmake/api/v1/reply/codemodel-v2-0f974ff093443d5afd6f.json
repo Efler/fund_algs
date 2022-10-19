@@ -27,7 +27,9 @@
 						9,
 						10,
 						11,
-						12
+						12,
+						13,
+						14
 					]
 				}
 			],
@@ -54,12 +56,21 @@
 						9,
 						10,
 						11,
-						12
+						12,
+						13,
+						14
 					]
 				}
 			],
 			"targets" : 
 			[
+				{
+					"directoryIndex" : 0,
+					"id" : "l2_draft_6::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l2_draft_6-Debug-157ea913c8443b860116.json",
+					"name" : "l2_draft_6",
+					"projectIndex" : 0
+				},
 				{
 					"directoryIndex" : 0,
 					"id" : "l2_task_1::@6890427a1f51a3e7e1df",
@@ -86,6 +97,13 @@
 					"id" : "l2_task_5::@6890427a1f51a3e7e1df",
 					"jsonFile" : "target-l2_task_5-Debug-a03dfbc788a8fda21c2a.json",
 					"name" : "l2_task_5",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "l2_task_6::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l2_task_6-Debug-c46f449f9d2c00bc45c6.json",
+					"name" : "l2_task_6",
 					"projectIndex" : 0
 				},
 				{

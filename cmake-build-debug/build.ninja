@@ -469,6 +469,72 @@ build l2_task_7.exe: C_EXECUTABLE_LINKER__l2_task_7_Debug CMakeFiles/l2_task_7.d
   TARGET_IMPLIB = libl2_task_7.dll.a
   TARGET_PDB = l2_task_7.exe.dbg
 
+# =============================================================================
+# Object build statements for EXECUTABLE target l2_task_6
+
+
+#############################################
+# Order-only phony target for l2_task_6
+
+build cmake_object_order_depends_target_l2_task_6: phony || CMakeFiles/l2_task_6.dir
+
+build CMakeFiles/l2_task_6.dir/lab_2/l2_task_6.c.obj: C_COMPILER__l2_task_6_Debug D$:/JetBrains/CLion$ 2022.2.3/CLionProjects/fund_algs/lab_2/l2_task_6.c || cmake_object_order_depends_target_l2_task_6
+  DEP_FILE = CMakeFiles\l2_task_6.dir\lab_2\l2_task_6.c.obj.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles\l2_task_6.dir
+  OBJECT_FILE_DIR = CMakeFiles\l2_task_6.dir\lab_2
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target l2_task_6
+
+
+#############################################
+# Link the executable l2_task_6.exe
+
+build l2_task_6.exe: C_EXECUTABLE_LINKER__l2_task_6_Debug CMakeFiles/l2_task_6.dir/lab_2/l2_task_6.c.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\l2_task_6.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = l2_task_6.exe
+  TARGET_IMPLIB = libl2_task_6.dll.a
+  TARGET_PDB = l2_task_6.exe.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target l2_draft_6
+
+
+#############################################
+# Order-only phony target for l2_draft_6
+
+build cmake_object_order_depends_target_l2_draft_6: phony || CMakeFiles/l2_draft_6.dir
+
+build CMakeFiles/l2_draft_6.dir/lab_2/l2_draft_6.c.obj: C_COMPILER__l2_draft_6_Debug D$:/JetBrains/CLion$ 2022.2.3/CLionProjects/fund_algs/lab_2/l2_draft_6.c || cmake_object_order_depends_target_l2_draft_6
+  DEP_FILE = CMakeFiles\l2_draft_6.dir\lab_2\l2_draft_6.c.obj.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles\l2_draft_6.dir
+  OBJECT_FILE_DIR = CMakeFiles\l2_draft_6.dir\lab_2
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target l2_draft_6
+
+
+#############################################
+# Link the executable l2_draft_6.exe
+
+build l2_draft_6.exe: C_EXECUTABLE_LINKER__l2_draft_6_Debug CMakeFiles/l2_draft_6.dir/lab_2/l2_draft_6.c.obj
+  FLAGS = -g
+  LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  OBJECT_DIR = CMakeFiles\l2_draft_6.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_FILE = l2_draft_6.exe
+  TARGET_IMPLIB = libl2_draft_6.dll.a
+  TARGET_PDB = l2_draft_6.exe.dbg
+
 
 #############################################
 # Utility command for edit_cache
@@ -495,6 +561,8 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
+build l2_draft_6: phony l2_draft_6.exe
+
 build l2_task_1: phony l2_task_1.exe
 
 build l2_task_2: phony l2_task_2.exe
@@ -502,6 +570,8 @@ build l2_task_2: phony l2_task_2.exe
 build l2_task_4: phony l2_task_4.exe
 
 build l2_task_5: phony l2_task_5.exe
+
+build l2_task_6: phony l2_task_6.exe
 
 build l2_task_7: phony l2_task_7.exe
 
@@ -529,7 +599,7 @@ build task_8: phony task_8.exe
 #############################################
 # Folder: D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug
 
-build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe task_8.exe l2_task_1.exe l2_task_2.exe l2_task_4.exe l2_task_5.exe l2_task_8.exe l2_task_7.exe
+build all: phony task_1.exe task_7.exe task_2.exe task_4.exe task_5.exe task_3.exe task_8.exe l2_task_1.exe l2_task_2.exe l2_task_4.exe l2_task_5.exe l2_task_8.exe l2_task_7.exe l2_task_6.exe l2_draft_6.exe
 
 # =============================================================================
 # Built-in targets

@@ -29,3 +29,7 @@ add_executable(l2_task_8
         lab_2/l2_task_8.c)
 add_executable(l2_task_7
         lab_2/l2_task_7.c)
+add_executable(l2_task_6
+        lab_2/l2_task_6.c)
+add_executable(l2_draft_6
+        lab_2/l2_draft_6.c)
