@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "l2_task_9.exe"
+			"path" : "l2_draft_9.exe"
 		},
 		{
-			"path" : "l2_task_9.pdb"
+			"path" : "l2_draft_9.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -59,7 +59,7 @@
 			]
 		}
 	],
-	"id" : "l2_task_9::@6890427a1f51a3e7e1df",
+	"id" : "l2_draft_9::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -79,8 +79,8 @@
 		],
 		"language" : "C"
 	},
-	"name" : "l2_task_9",
-	"nameOnDisk" : "l2_task_9.exe",
+	"name" : "l2_draft_9",
+	"nameOnDisk" : "l2_draft_9.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -101,7 +101,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "lab_2/l2_task_9.c",
+			"path" : "lab_2/l2_draft_9.c",
 			"sourceGroupIndex" : 0
 		}
 	],
