@@ -54,6 +54,7 @@ void matches_in_files(path_matches res[], char str[], int count_files, ...){
         res[i].path = file_name;
         fclose(fin);
     }
+    va_end(l);
 }
 
 
