@@ -10,6 +10,22 @@ typedef struct arr{
     int count_of_el;
 }arr;
 
+int clear_specific_array(arr* arrays, char Name){
+    for(int i = 0; i < 26; i++){
+        if(arrays[i].name == toupper(Name)){
+            free(arrays[i].value);
+            arrays[i].value_buff = 4;
+            arrays[i].count_of_el = 0;
+            arrays[i].value = (int*)malloc(arrays[i].value_buff * sizeof(int));
+            if(!arrays[i].value){
+                return 1;
+            }
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void clear_arrays_value(arr* arrays, int* checker){
     if(*checker != -1){
         for(int i = 0; i < *checker+1; i++){
@@ -40,7 +56,7 @@ int create_arrays(arr* arrays, int* checker){
 
 int find_array(arr* arrays, char Name){
     for(int i = 0; i < 26; i++){
-        if(arrays[i].name == Name) return i;
+        if(arrays[i].name == toupper(Name)) return i;
     }
 }
 
@@ -93,16 +109,68 @@ int load_args(FILE* fin, char** file, char* Name, int* k){
     return 0;
 }
 
-int load(FILE* fin, char* comm, arr* arrays){
+int save(FILE* fin, char* comm, arr* arrays){
     char Name;
     int k = 6;
     char* file = (char*)malloc((k) * sizeof(char));
     int error = load_args(fin, &file, &Name, &k);
     if(error == 1){
+        free(file);
         return 1;
     }else if(error == 2){
+        free(file);
         return 2;
     }else if(error == 3){
+        free(file);
+        return 3;
+    }
+    FILE* file_save = fopen(file, "w");
+    if(!file_save){
+        free(file);
+        return 4;
+    }
+    int index = find_array(arrays, Name);
+    char* num;
+    int n;
+    int count_digits;
+    int count = arrays[index].count_of_el;
+    while(count != 0){
+        count_digits = 0;
+        n = *(arrays[index].value + (arrays[index].count_of_el - count));
+        while(n){
+            count_digits++;
+            n /= 10;
+        }
+        num = (char*)malloc((count_digits + 1) * sizeof(char));
+        if(!num){
+            fclose(file_save);
+            free(file);
+            return 3;
+        }
+        itoa(*(arrays[index].value + (arrays[index].count_of_el - count)), num, 10);
+        fputs(num, file_save);
+        fputc(' ', file_save);
+        count--;
+        free(num);
+    }
+    fclose(file_save);
+    free(file);
+    return 0;
+}
+
+int load(FILE* fin, char* comm, arr* arrays, int* che){
+    char Name;
+    int k = 6;
+    char* file = (char*)malloc((k) * sizeof(char));
+    int error = load_args(fin, &file, &Name, &k);
+    if(error == 1){
+        free(file);
+        return 1;
+    }else if(error == 2){
+        free(file);
+        return 2;
+    }else if(error == 3){
+        free(file);
         return 3;
     }
     FILE* file_load = fopen(file, "r");
@@ -111,6 +179,15 @@ int load(FILE* fin, char* comm, arr* arrays){
         return 4;
     }
     int index = find_array(arrays, Name);
+    if(*che){
+        if(arrays[index].count_of_el){
+            if(clear_specific_array(arrays, Name)){
+                fclose(file_load);
+                free(file);
+                return 7;
+            }
+        }
+    }else *che = 1;
     char c;
     char cp;
     int check_cp = 0;
@@ -221,7 +298,7 @@ int load(FILE* fin, char* comm, arr* arrays){
                 }
                 break;
             }
-        }else if(!isdigit(c)){
+        }else if(!isdigit(c) && c != '-'){
                 fclose(file_load);
                 free(file);
                 free(buff);
@@ -319,98 +396,167 @@ int main(int argc, char *argv[]){
         printf("Could not open a file\n");
         return 0;
     }
-    int error = 0;
-    char* comm = write_command(fin, &error);
-    if(!comm){
-        printf("Memory Allocation Error: command\n");
-        fclose(fin);
-        return 0;
-    }
-    if(error == 1){
-        printf("Wrong format of a command\n");
-        free(comm);
-        fclose(fin);
-        return 0;
-    }
-    arr arrays[26];
+    char* comm;
+    int check_comm = 0;
+    int error;
     int checker = 0;
+    int che = 0;
+    arr arrays[26];
     if(create_arrays(arrays, &checker)){
         printf("Memory Allocation Error: arrays\n");
         clear_arrays_value(arrays, &checker);
-        free(comm);
+        if(check_comm) free(comm);
+        else check_comm++;
         fclose(fin);
         return 0;
     }
-    if(!strcmp(comm, "Load")){
-        int load_error = load(fin, comm, arrays);
-        if(load_error == 1){
-            printf("Wrong syntax of arguments: Load\n");
-            checker = -1;
-            clear_arrays_value(arrays, &checker);
-            free(comm);
-            fclose(fin);
-            return 0;
-        }else if(load_error == 2){
-            printf("Wrong syntax of arguments: Load\n");
-            checker = -1;
-            clear_arrays_value(arrays, &checker);
-            free(comm);
-            fclose(fin);
-            return 0;
-        }else if(load_error == 3){
-            printf("Memory Allocation Error: Load\n");
-            checker = -1;
-            clear_arrays_value(arrays, &checker);
-            free(comm);
-            fclose(fin);
-            return 0;
-        }else if(load_error == 4){
-            printf("Could not open a file: Load\n");
-            checker = -1;
-            clear_arrays_value(arrays, &checker);
-            free(comm);
-            fclose(fin);
-            return 0;
-        }else if(load_error == 5){
-            printf("Invalid numbers in file: Load\n");
-            checker = -1;
-            clear_arrays_value(arrays, &checker);
-            free(comm);
-            fclose(fin);
-            return 0;
-        }else if(load_error == 6) {
-            printf("Memory Allocation Error: Load ---> arrays");
+    while(!feof(fin)){
+        error = 0;
+        comm = write_command(fin, &error);
+        if(!comm){
+            printf("Memory Allocation Error: command\n");
             checker = -1;
             clear_arrays_value(arrays, &checker);
             free(comm);
             fclose(fin);
             return 0;
         }
-        for(int i = 0; i < arrays[5].count_of_el; i++){
-            printf("%d\n", *(arrays[5].value + i));
+        if(error == 1){
+            printf("Wrong format of a command\n");
+            checker = -1;
+            clear_arrays_value(arrays, &checker);
+            free(comm);
+            fclose(fin);
+            return 0;
         }
-    }else if(!strcmp(comm, "Save")){
+        int comm_error;
+        if(!strcmp(comm, "Load")){
+            comm_error = load(fin, comm, arrays, &che);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Load\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Wrong syntax of arguments: Load\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Memory Allocation Error: Load\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Could not open a file: Load\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Invalid numbers in file: Load\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 6) {
+                printf("Memory Allocation Error: Load ---> arrays\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            else if(comm_error == 7) {
+                printf("Memory Allocation Error: Load ---> clear_specific_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Load ---> Done!\n");
+            for(int i = 0; i < arrays[5].count_of_el; i++){
+                printf("%d ", *(arrays[5].value + i));
+            }
+            printf("\n");
+        }else if(!strcmp(comm, "Save")){
+            comm_error = save(fin, comm, arrays);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Save\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Wrong syntax of arguments: Save\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Memory Allocation Error: Save\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Could not open a file: Save\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Save ---> Done!\n");
+        }else if(!strcmp(comm, "Rand")){
 
-    }else if(!strcmp(comm, "Rand")){
+        }else if(!strcmp(comm, "Concat")){
 
-    }else if(!strcmp(comm, "Concat")){
+        }else if(!strcmp(comm, "Free")){
 
-    }else if(!strcmp(comm, "Free")){
+        }else if(!strcmp(comm, "Remove")){
 
-    }else if(!strcmp(comm, "Remove")){
+        }else if(!strcmp(comm, "Copy")){
 
-    }else if(!strcmp(comm, "Copy")){
+        }else if(!strcmp(comm, "Sort")){
 
-    }else if(!strcmp(comm, "Sort")){
+        }else if(!strcmp(comm, "Shuffle")){
 
-    }else if(!strcmp(comm, "Shuffle")){
+        }else if(!strcmp(comm, "Stats")){
 
-    }else if(!strcmp(comm, "Stats")){
+        }else if(!strcmp(comm, "Print")){
 
-    }else if(!strcmp(comm, "Print")){
-
-    }else{
-        printf("Wrong command\n");
+        }else{
+            printf("Wrong command\n");
+            checker = -1;
+            clear_arrays_value(arrays, &checker);
+            free(comm);
+            fclose(fin);
+            return 0;
+        }
     }
     checker = -1;
     clear_arrays_value(arrays, &checker);
