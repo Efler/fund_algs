@@ -60,6 +60,130 @@ int find_array(arr* arrays, char Name){
     }
 }
 
+void print_array(arr* arrays, int a, int b, int index){
+    if(b != -1) {
+        while (a <= b) {
+            printf("%d ", *(arrays[index].value + a));
+            a++;
+        }
+    }
+    printf("\n");
+}
+
+int print(FILE* fin, char* comm, arr* arrays){
+    char c;
+    char Name = fgetc(fin);
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    if(c != '\n' && c != ',' && c != EOF){
+        return 1;
+    }
+    c = fgetc(fin);
+    int index = find_array(arrays, Name);
+    int k = 4;
+    char* buff = (char*)malloc((k) * sizeof(char));
+    if(!buff){
+        return 2;
+    }
+    char* p_buff = buff;
+    while(!feof(fin)){
+        c = fgetc(fin);
+        if(c == ','){
+            if((p_buff - buff) == k){
+                char* p = (char*)realloc(buff, (k+1)*sizeof(char));
+                if(!p){
+                    free(buff);
+                    return 2;
+                }else{
+                    buff = p;
+                    p_buff = p + k;
+                }
+            }
+            *p_buff = 0;
+            int a = atoi(buff);
+            free(buff);
+            c = fgetc(fin);
+            int pr_digit = 0;
+            int b = 0;
+            while(!feof(fin)){
+                c = fgetc(fin);
+                if(c == '\n' || c == EOF){
+                    if(a < 0 || b < 0) return 5;
+                    else if(a > b) return 4;
+                    else if(a > (arrays[index].count_of_el - 1) || b > (arrays[index].count_of_el - 1)) return 6;
+                    else{
+                        print_array(arrays, a, b, index);
+                        return 0;
+                    }
+                }else{
+                    b = (pr_digit * 10) + (c - '0');
+                    pr_digit = b;
+                }
+            }
+        }else if(c == '\n' || c == EOF){
+            if((p_buff - buff) == k){
+                char* p = (char*)realloc(buff, (k+1)*sizeof(char));
+                if(!p){
+                    free(buff);
+                    return 2;
+                }else{
+                    buff = p;
+                    p_buff = p + k;
+                }
+            }
+            *p_buff = 0;
+            if(!strcmp(buff, "all")){
+                print_array(arrays, 0, arrays[index].count_of_el - 1, index);
+                free(buff);
+                return 0;
+            }else{
+                free(buff);
+                return 3;
+            }
+        }else{
+            if((p_buff - buff) == k){
+                k *= 2;
+                char* p = (char*)realloc(buff, (k)*sizeof(char));
+                if(!p){
+                    free(buff);
+                    return 2;
+                }else{
+                    buff = p;
+                    p_buff = p + k/2;
+                }
+            }
+            *p_buff++ = c;
+        }
+    }
+
+}
+
+int command_free(FILE* fin, arr* arrays, char* comm){
+    char c;
+    char Name = fgetc(fin);
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    c = fgetc(fin);
+    int index = find_array(arrays, Name);
+    int aaa = arrays[index].count_of_el;
+    if(arrays[index].count_of_el){
+        if(clear_specific_array(arrays, Name)){
+            return 2;
+        }
+    }
+    return 0;
+}
+
 int load_args(FILE* fin, char** file, char* Name, int* k){
     char c;
     *Name = fgetc(fin);
@@ -491,10 +615,6 @@ int main(int argc, char *argv[]){
                 return 0;
             }
             printf("Load ---> Done!\n");
-            for(int i = 0; i < arrays[5].count_of_el; i++){
-                printf("%d ", *(arrays[5].value + i));
-            }
-            printf("\n");
         }else if(!strcmp(comm, "Save")){
             comm_error = save(fin, comm, arrays);
             if(comm_error == 1){
@@ -536,7 +656,25 @@ int main(int argc, char *argv[]){
         }else if(!strcmp(comm, "Concat")){
 
         }else if(!strcmp(comm, "Free")){
-
+            comm_error = command_free(fin, arrays, comm);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Free\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: free ---> clear_specific_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Free ---> Done!\n");
         }else if(!strcmp(comm, "Remove")){
 
         }else if(!strcmp(comm, "Copy")){
@@ -548,7 +686,57 @@ int main(int argc, char *argv[]){
         }else if(!strcmp(comm, "Stats")){
 
         }else if(!strcmp(comm, "Print")){
-
+            comm_error = print(fin, comm, arrays);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Print\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: Print\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Wrong syntax of arguments: Print\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Print ---> Range error: a > b\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Print ---> Range error: at least one of borders less than 0\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 6){
+                printf("Print ---> Range error: at least one of borders points to a non-existent element\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Print ---> Done!\n");
         }else{
             printf("Wrong command\n");
             checker = -1;
