@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 typedef struct arr{
     char name;
@@ -175,11 +176,273 @@ int command_free(FILE* fin, arr* arrays, char* comm){
     c = fgetc(fin);
     c = fgetc(fin);
     int index = find_array(arrays, Name);
-    int aaa = arrays[index].count_of_el;
     if(arrays[index].count_of_el){
         if(clear_specific_array(arrays, Name)){
             return 2;
         }
+    }
+    return 0;
+}
+
+int create_rand_array(arr* arrays, int index, int count, int a, int b){
+    srand(time(NULL));
+    arrays[index].value_buff = count;
+    free(arrays[index].value);
+    arrays[index].value = (int*)malloc(arrays[index].value_buff * sizeof(int));
+    if(!arrays[index].value){
+        return 1;
+    }
+    while(arrays[index].count_of_el != count){
+        *(arrays[index].value + arrays[index].count_of_el) = rand()%(b-a+1) + a;
+        arrays[index].count_of_el++;
+    }
+    return 0;
+}
+
+int copy_array(arr* arrays, int index1, int index2, int a, int b){
+    int count = b - a + 1;
+    arrays[index2].value_buff = count;
+    free(arrays[index2].value);
+    arrays[index2].value = (int*)malloc(arrays[index2].value_buff * sizeof(int));
+    if(!arrays[index2].value){
+        return 1;
+    }
+    while(arrays[index2].count_of_el != count){
+        *(arrays[index2].value + arrays[index2].count_of_el) = *(arrays[index1].value + a);
+        arrays[index2].count_of_el++;
+        a++;
+    }
+    return 0;
+}
+
+int remove_from_array(arr* arrays, int index, int a, int count){
+    int k = arrays[index].count_of_el - (count);
+    int* buff = (int*)malloc(k * sizeof(int));
+    if(!buff){
+        return 1;
+    }
+    int n = 0;
+    while(n != a){
+        *(buff + n) = *(arrays[index].value + n);
+        n++;
+    }
+    int sch = n;
+    n += count;
+    while(n < arrays[index].count_of_el){
+        *(buff + sch) = *(arrays[index].value + n);
+        n++;
+        sch++;
+    }
+    arrays[index].count_of_el = k;
+    arrays[index].value_buff = k;
+    free(arrays[index].value);
+    arrays[index].value = buff;
+    return 0;
+}
+
+int command_remove(FILE* fin, arr* arrays, char* comm){
+    char c;
+    char Name = fgetc(fin);
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    c = fgetc(fin);
+    int minus = 1;
+    int pr_digit = 0;
+    int a = 0;
+    while(c != ','){
+        c = fgetc(fin);
+        if(c == ','){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            a = (pr_digit * 10) + (c - '0');
+            pr_digit = a;
+        }
+    }
+    a *= minus;
+    c = fgetc(fin);
+    if(a < 0){
+        return 2;
+    }
+    minus = 1;
+    pr_digit = 0;
+    int count = 0;
+    while(c != '\n' && c != EOF){
+        c = fgetc(fin);
+        if(c == '\n' || c == EOF){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            count = (pr_digit * 10) + (c - '0');
+            pr_digit = count;
+        }
+    }
+    count *= minus;
+    if(count < 1){
+        return 3;
+    }
+    int index = find_array(arrays, Name);
+    if((a + count) > arrays[index].count_of_el){
+        return 4;
+    }
+    if(remove_from_array(arrays, index, a, count)){
+        return 5;
+    }
+    return 0;
+}
+
+int copy(FILE* fin, arr* arrays, char* comm){
+    char c;
+    char Name = fgetc(fin);
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    c = fgetc(fin);
+    int minus = 1;
+    int pr_digit = 0;
+    int a = 0;
+    while(c != ','){
+        c = fgetc(fin);
+        if(c == ','){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            a = (pr_digit * 10) + (c - '0');
+            pr_digit = a;
+        }
+    }
+    a *= minus;
+    c = fgetc(fin);
+    if(a < 0){
+        return 3;
+    }
+    minus = 1;
+    pr_digit = 0;
+    int b = 0;
+    while(c != ','){
+        c = fgetc(fin);
+        if(c == ','){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            b = (pr_digit * 10) + (c - '0');
+            pr_digit = b;
+        }
+    }
+    b *= minus;
+    c = fgetc(fin);
+    if(a > b){
+        return 4;
+    }
+    char Name2 = fgetc(fin);
+    if(!isalpha(Name2)){
+        return 1;
+    }
+    if(toupper(Name2) < 65 || toupper(Name2) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    if(c != '\n' && c != EOF){
+        return 1;
+    }
+    int index1 = find_array(arrays, Name);
+    int index2 = find_array(arrays, Name2);
+    if(arrays[index2].count_of_el){
+        if(clear_specific_array(arrays, Name)){
+            return 2;
+        }
+    }
+    if(copy_array(arrays, index1, index2, a, b)){
+        return 5;
+    }
+    return 0;
+}
+
+int command_rand(FILE* fin, arr* arrays, char* comm){
+    char c;
+    char Name = fgetc(fin);
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    c = fgetc(fin);
+    int index = find_array(arrays, Name);
+    if(arrays[index].count_of_el){
+        if(clear_specific_array(arrays, Name)){
+            return 2;
+        }
+    }
+    int minus = 1;
+    int pr_digit = 0;
+    int count = 0;
+    while(c != ','){
+        c = fgetc(fin);
+        if(c == ','){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            count = (pr_digit * 10) + (c - '0');
+            pr_digit = count;
+        }
+    }
+    count *= minus;
+    c = fgetc(fin);
+    if(count <= 0){
+        return 3;
+    }
+    minus = 1;
+    pr_digit = 0;
+    int a = 0;
+    while(c != ','){
+        c = fgetc(fin);
+        if(c == ','){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            a = (pr_digit * 10) + (c - '0');
+            pr_digit = a;
+        }
+    }
+    a *= minus;
+    c = fgetc(fin);
+    minus = 1;
+    pr_digit = 0;
+    int b = 0;
+    while(c != '\n' && c != EOF){
+        c = fgetc(fin);
+        if(c == '\n' || c == EOF){
+            continue;
+        }else if(c == '-'){
+            minus = -1;
+        }else{
+            b = (pr_digit * 10) + (c - '0');
+            pr_digit = b;
+        }
+    }
+    b *= minus;
+    if(a > b){
+        return 4;
+    }
+    if(create_rand_array(arrays, index, count, a, b)){
+        return 5;
     }
     return 0;
 }
@@ -652,8 +915,51 @@ int main(int argc, char *argv[]){
             }
             printf("Save ---> Done!\n");
         }else if(!strcmp(comm, "Rand")){
-
+            comm_error = command_rand(fin, arrays, comm);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Rand\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: rand ---> clear_specific_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Rand arguments error: count < 1\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Rand borders error: a > b\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Memory Allocation Error: rand ---> create_rand_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Rand ---> Done!\n");
         }else if(!strcmp(comm, "Concat")){
+
 
         }else if(!strcmp(comm, "Free")){
             comm_error = command_free(fin, arrays, comm);
@@ -676,9 +982,93 @@ int main(int argc, char *argv[]){
             }
             printf("Free ---> Done!\n");
         }else if(!strcmp(comm, "Remove")){
-
+            comm_error = command_remove(fin, arrays, comm);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Copy\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Remove arguments error: index < 0\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Remove arguments error: count < 1\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Remove error: request to delete non-existent elements\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Memory Allocation Error: remove ---> remove_from_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Remove ---> Done!\n");
         }else if(!strcmp(comm, "Copy")){
-
+            comm_error = copy(fin, arrays, comm);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Copy\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: copy ---> clear_specific_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Copy borders error: at least one of borders is less than 0\n\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Copy borders error: a > b\n\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Memory Allocation Error: copy ---> copy_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Copy ---> Done!\n");
         }else if(!strcmp(comm, "Sort")){
 
         }else if(!strcmp(comm, "Shuffle")){
