@@ -240,6 +240,57 @@ int remove_from_array(arr* arrays, int index, int a, int count){
     return 0;
 }
 
+int concat_arrays(arr* arrays, int index1, int index2){
+    int k = arrays[index1].count_of_el + arrays[index2].count_of_el;
+    int* p = (int*)realloc(arrays[index1].value, (k)*sizeof(int));
+    if(!p){
+        return 1;
+    }else{
+        arrays[index1].value = p;
+    }
+    for(int i = 0; i < arrays[index2].count_of_el; i++){
+        *(arrays[index1].value + arrays[index1].count_of_el + i) = *(arrays[index2].value + i);
+    }
+    arrays[index1].value_buff = k;
+    arrays[index1].count_of_el = k;
+    return 0;
+}
+
+int concat(FILE* fin, arr* arrays, char* comm){
+    char c;
+    char Name1 = fgetc(fin);
+    if(!isalpha(Name1)){
+        return 1;
+    }
+    if(toupper(Name1) < 65 || toupper(Name1) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    c = fgetc(fin);
+    char Name2 = fgetc(fin);
+    if(!isalpha(Name2)){
+        return 1;
+    }
+    if(toupper(Name2) < 65 || toupper(Name2) > 90){
+        return 1;
+    }
+    c = fgetc(fin);
+    int index1 = find_array(arrays, Name1);
+    int index2 = find_array(arrays, Name2);
+    if(arrays[index2].count_of_el == 0){
+        return 0;
+    }else if(arrays[index1].count_of_el == 0 && arrays[index2].count_of_el != 0){
+        if(copy_array(arrays, index2, index1, 0, arrays[index2].count_of_el - 1)){
+            return 2;
+        }
+    }else{
+        if(concat_arrays(arrays, index1, index2)){
+            return 3;
+        }
+    }
+    return 0;
+}
+
 int command_remove(FILE* fin, arr* arrays, char* comm){
     char c;
     char Name = fgetc(fin);
@@ -959,8 +1010,33 @@ int main(int argc, char *argv[]){
             }
             printf("Rand ---> Done!\n");
         }else if(!strcmp(comm, "Concat")){
-
-
+            comm_error = concat(fin, arrays, comm);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Concat\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: concat ---> copy_array\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Memory Allocation Error: concat ---> concat_arrays\n");
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Concat ---> Done!\n");
         }else if(!strcmp(comm, "Free")){
             comm_error = command_free(fin, arrays, comm);
             if(comm_error == 1){
