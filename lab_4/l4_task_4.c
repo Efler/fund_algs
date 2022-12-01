@@ -3,6 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <math.h>
+#define EPSILON 1e-7
+
+typedef struct count_el{
+    int num;
+    int count;
+}count_el;
 
 typedef struct arr{
     char name;
@@ -38,13 +45,13 @@ void clear_arrays_value(arr* arrays, int* checker){
             free(arrays[i].value);
         }
     }
-    printf("AHAHAHAHAHHA\n");
+    printf("[App: clearing arrays]");
 }
 
 int create_arrays(arr* arrays, int* checker){
     for(int i = 0; i < 26; i++){
         arrays[i].name = (char)(65 + i);
-        arrays[i].value_buff = 4;
+        arrays[i].value_buff = 1;
         arrays[i].count_of_el = 0;
         arrays[i].value = (int*)malloc(arrays[i].value_buff * sizeof(int));
         if(!arrays[i].value){
@@ -61,7 +68,8 @@ int find_array(arr* arrays, char Name){
     }
 }
 
-void print_array(arr* arrays, int a, int b, int index){
+void print_array(arr* arrays, int a, int b, int index, char Name){
+    printf("%c:  ", Name);
     if(b != -1) {
         while (a <= b) {
             printf("%d ", *(arrays[index].value + a));
@@ -71,9 +79,10 @@ void print_array(arr* arrays, int a, int b, int index){
     printf("\n");
 }
 
-int print(FILE* fin, char* comm, arr* arrays){
+int print(FILE* fin, char* comm, arr* arrays, char* name_out){
     char c;
     char Name = fgetc(fin);
+    *name_out = Name;
     if(!isalpha(Name)){
         return 1;
     }
@@ -118,7 +127,7 @@ int print(FILE* fin, char* comm, arr* arrays){
                     else if(a > b) return 4;
                     else if(a > (arrays[index].count_of_el - 1) || b > (arrays[index].count_of_el - 1)) return 6;
                     else{
-                        print_array(arrays, a, b, index);
+                        print_array(arrays, a, b, index, Name);
                         return 0;
                     }
                 }else{
@@ -139,7 +148,7 @@ int print(FILE* fin, char* comm, arr* arrays){
             }
             *p_buff = 0;
             if(!strcmp(buff, "all")){
-                print_array(arrays, 0, arrays[index].count_of_el - 1, index);
+                print_array(arrays, 0, arrays[index].count_of_el - 1, index, Name);
                 free(buff);
                 return 0;
             }else{
@@ -164,9 +173,10 @@ int print(FILE* fin, char* comm, arr* arrays){
 
 }
 
-int command_free(FILE* fin, arr* arrays, char* comm){
+int command_free(FILE* fin, arr* arrays, char* comm, char* name_out){
     char c;
     char Name = fgetc(fin);
+    *name_out = Name;
     if(!isalpha(Name)){
         return 1;
     }
@@ -291,9 +301,10 @@ int concat(FILE* fin, arr* arrays, char* comm){
     return 0;
 }
 
-int command_remove(FILE* fin, arr* arrays, char* comm){
+int command_remove(FILE* fin, arr* arrays, char* comm, char* name_out){
     char c;
     char Name = fgetc(fin);
+    *name_out = Name;
     if(!isalpha(Name)){
         return 1;
     }
@@ -422,9 +433,10 @@ int copy(FILE* fin, arr* arrays, char* comm){
     return 0;
 }
 
-int command_rand(FILE* fin, arr* arrays, char* comm){
+int command_rand(FILE* fin, arr* arrays, char* comm, char* name_out){
     char c;
     char Name = fgetc(fin);
+    *name_out = Name;
     if(!isalpha(Name)){
         return 1;
     }
@@ -547,11 +559,12 @@ int load_args(FILE* fin, char** file, char* Name, int* k){
     return 0;
 }
 
-int save(FILE* fin, char* comm, arr* arrays){
+int save(FILE* fin, char* comm, arr* arrays, char* name_out){
     char Name;
     int k = 6;
     char* file = (char*)malloc((k) * sizeof(char));
     int error = load_args(fin, &file, &Name, &k);
+    *name_out = Name;
     if(error == 1){
         free(file);
         return 1;
@@ -596,11 +609,12 @@ int save(FILE* fin, char* comm, arr* arrays){
     return 0;
 }
 
-int load(FILE* fin, char* comm, arr* arrays, int* che){
+int load(FILE* fin, char* comm, arr* arrays, int* che, char* name_out){
     char Name;
     int k = 6;
     char* file = (char*)malloc((k) * sizeof(char));
     int error = load_args(fin, &file, &Name, &k);
+    *name_out = Name;
     if(error == 1){
         free(file);
         return 1;
@@ -824,14 +838,186 @@ char* write_command(FILE* fin, int* error){
     return buff;
 }
 
+int compare_up(const void* x_void, const void* y_void){
+    int x = *(int*)x_void;
+    int y = *(int*)y_void;
+    return x - y;
+}
+
+int compare_down(const void* x_void, const void* y_void){
+    int x = *(int*)x_void;
+    int y = *(int*)y_void;
+    return y - x;
+}
+
+int compare_shuffle(const void* x_void, const void* y_void){
+    return (rand()%3 - 1);
+}
+
+int sort(FILE* fin, char* comm, arr* arrays, char* sign, char* name_out){
+    char c;
+    char Name = fgetc(fin);
+    *name_out = Name;
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    int index = find_array(arrays, Name);
+    *sign = fgetc(fin);
+    if(*sign == '+'){
+        if(arrays[index].value_buff != arrays[index].count_of_el){
+            int* p = (int*)realloc(arrays[index].value, (arrays[index].count_of_el)*sizeof(int));
+            if(!p){
+                return 3;
+            }else{
+                arrays[index].value = p;
+            }
+        }
+        qsort(arrays[index].value, arrays[index].count_of_el, sizeof(int), compare_up);
+    }else if(*sign == '-'){
+        if(arrays[index].value_buff != arrays[index].count_of_el){
+            int* p = (int*)realloc(arrays[index].value, (arrays[index].count_of_el)*sizeof(int));
+            if(!p){
+                return 3;
+            }else{
+                arrays[index].value = p;
+            }
+        }
+        qsort(arrays[index].value, arrays[index].count_of_el, sizeof(int), compare_down);
+    }else{
+        return 2;
+    }
+    c = fgetc(fin);
+    return 0;
+}
+
+int shuffle(FILE* fin, char* comm, arr* arrays, char* name_out){
+    srand(time(NULL));
+    char c;
+    char Name = fgetc(fin);
+    *name_out = Name;
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    int index = find_array(arrays, Name);
+    c = fgetc(fin);
+    if(arrays[index].value_buff != arrays[index].count_of_el){
+        int* p = (int*)realloc(arrays[index].value, (arrays[index].count_of_el)*sizeof(int));
+        if(!p){
+            return 2;
+        }else{
+            arrays[index].value = p;
+        }
+    }
+    qsort(arrays[index].value, arrays[index].count_of_el, sizeof(int), compare_shuffle);
+    return 0;
+}
+
+int stats(FILE* fin, char* comm, arr* arrays, int* max, int* min, int* index_max, int* index_min, int* max_count, double* middle, double* max_differ, int* max_differ_num, int* count, char* name_out, int* count_of_elements){
+    char c;
+    char Name = fgetc(fin);
+    *name_out = Name;
+    if(!isalpha(Name)){
+        return 1;
+    }
+    if(toupper(Name) < 65 || toupper(Name) > 90){
+        return 1;
+    }
+    int index = find_array(arrays, Name);
+    c = fgetc(fin);
+    if(arrays[index].count_of_el == 0){
+        return 3;
+    }
+    int k = 4;
+    int n = 1;
+    int checkup1 = 0;
+    int checkup2 = 0;
+    int checkup3 = 1;
+    int often = 1;
+    *max = *(arrays[index].value);
+    *min = *(arrays[index].value);
+    count_el* mass = (count_el*)malloc(k * sizeof(count_el));
+    mass[0].num = *(arrays[index].value);
+    mass[0].count = 1;
+    for(int i = 0; i < arrays[index].count_of_el; i++){
+        if(*(arrays[index].value + i) < *min){
+            *min = *(arrays[index].value + i);
+            *index_min = i;
+        }
+        if(*(arrays[index].value + i) > *max){
+            *max = *(arrays[index].value + i);
+            *index_max = i;
+        }
+        *middle += *(arrays[index].value + i);
+        for(int s = 0; s < n; s++){
+            checkup3 = 1;
+            if(!checkup1){
+                checkup1 += 1;
+                break;
+            }else if(*(arrays[index].value + i) == mass[s].num){
+                mass[s].count++;
+                if(mass[s].count > often){
+                    often = mass[s].count;
+                }
+                break;
+            }else{
+                checkup3 = 0;
+            }
+        }
+        if(!checkup3){
+            if((k - n) == 0){
+                k *= 2;
+                count_el* p = (count_el*)realloc(mass, k * sizeof(count_el));
+                if(!p){
+                    free(mass);
+                    return 2;
+                }else{
+                    mass = p;
+                }
+            }
+            n++;
+            mass[n-1].num = *(arrays[index].value + i);
+            mass[n-1].count = 1;
+        }
+    }
+    for(int s = 0; s < n; s++){
+        if(often == mass[s].count){
+            if(!checkup2){
+                *max_count = mass[s].num;
+                checkup2++;
+            }else{
+                if(*max_count < mass[s].num) *max_count = mass[s].num;
+            }
+        }
+    }
+    free(mass);
+    *middle /= arrays[index].count_of_el;
+    *count = often;
+    *count_of_elements = arrays[index].count_of_el;
+    if(fabs(*middle - *min) - fabs(*middle - *max) > EPSILON){
+        *max_differ = fabs(*middle - *min);
+        *max_differ_num = *min;
+    }else{
+        *max_differ = fabs(*middle - *max);
+        *max_differ_num = *max;
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]){
+    printf("\n");
     if(argc != 2){
-        printf("Wrong number of arguments\n");
+        printf("Wrong number of arguments\n\n");
         return 0;
     }
     FILE* fin = fopen(argv[1], "r");
     if(!fin){
-        printf("Could not open a file\n");
+        printf("Could not open a file\n\n");
         return 0;
     }
     char* comm;
@@ -839,9 +1025,11 @@ int main(int argc, char *argv[]){
     int error;
     int checker = 0;
     int che = 0;
+    char sign;
+    char name_out;
     arr arrays[26];
     if(create_arrays(arrays, &checker)){
-        printf("Memory Allocation Error: arrays\n");
+        printf("Memory Allocation Error: arrays\n\n");
         clear_arrays_value(arrays, &checker);
         if(check_comm) free(comm);
         else check_comm++;
@@ -852,7 +1040,7 @@ int main(int argc, char *argv[]){
         error = 0;
         comm = write_command(fin, &error);
         if(!comm){
-            printf("Memory Allocation Error: command\n");
+            printf("Memory Allocation Error: command\n\n");
             checker = -1;
             clear_arrays_value(arrays, &checker);
             free(comm);
@@ -860,7 +1048,7 @@ int main(int argc, char *argv[]){
             return 0;
         }
         if(error == 1){
-            printf("Wrong format of a command\n");
+            printf("Wrong format of a command\n\n");
             checker = -1;
             clear_arrays_value(arrays, &checker);
             free(comm);
@@ -869,9 +1057,9 @@ int main(int argc, char *argv[]){
         }
         int comm_error;
         if(!strcmp(comm, "Load")){
-            comm_error = load(fin, comm, arrays, &che);
+            comm_error = load(fin, comm, arrays, &che, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Load\n");
+                printf("Wrong syntax of arguments: Load %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -879,7 +1067,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Wrong syntax of arguments: Load\n");
+                printf("Wrong syntax of arguments: Load %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -887,7 +1075,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Memory Allocation Error: Load\n");
+                printf("Memory Allocation Error: Load %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -895,7 +1083,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 4){
-                printf("Could not open a file: Load\n");
+                printf("Could not open a file: Load %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -903,7 +1091,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 5){
-                printf("Invalid numbers in file: Load\n");
+                printf("Invalid numbers in file: Load %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -911,7 +1099,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 6) {
-                printf("Memory Allocation Error: Load ---> arrays\n");
+                printf("Memory Allocation Error: Load %c ---> arrays\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -920,7 +1108,7 @@ int main(int argc, char *argv[]){
                 return 0;
             }
             else if(comm_error == 7) {
-                printf("Memory Allocation Error: Load ---> clear_specific_array\n");
+                printf("Memory Allocation Error: Load %c ---> clear_specific_array\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -928,11 +1116,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Load ---> Done!\n");
+            printf("Load %c ---> Done!\n\n", name_out);
         }else if(!strcmp(comm, "Save")){
-            comm_error = save(fin, comm, arrays);
+            comm_error = save(fin, comm, arrays, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Save\n");
+                printf("Wrong syntax of arguments: Save %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -940,7 +1128,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Wrong syntax of arguments: Save\n");
+                printf("Wrong syntax of arguments: Save %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -948,7 +1136,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Memory Allocation Error: Save\n");
+                printf("Memory Allocation Error: Save %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -956,7 +1144,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 4){
-                printf("Could not open a file: Save\n");
+                printf("Could not open a file: Save %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -964,11 +1152,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Save ---> Done!\n");
+            printf("Save %c ---> Done!\n\n", name_out);
         }else if(!strcmp(comm, "Rand")){
-            comm_error = command_rand(fin, arrays, comm);
+            comm_error = command_rand(fin, arrays, comm, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Rand\n");
+                printf("Wrong syntax of arguments: Rand %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -976,7 +1164,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Memory Allocation Error: rand ---> clear_specific_array\n");
+                printf("Memory Allocation Error: rand %c ---> clear_specific_array\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -984,7 +1172,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Rand arguments error: count < 1\n");
+                printf("Rand %c arguments error: count < 1\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -992,7 +1180,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 4){
-                printf("Rand borders error: a > b\n");
+                printf("Rand %c borders error: a > b\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1000,7 +1188,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 5){
-                printf("Memory Allocation Error: rand ---> create_rand_array\n");
+                printf("Memory Allocation Error: rand %c ---> create_rand_array\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1008,11 +1196,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Rand ---> Done!\n");
+            printf("Rand %c ---> Done!\n\n", name_out);
         }else if(!strcmp(comm, "Concat")){
             comm_error = concat(fin, arrays, comm);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Concat\n");
+                printf("Wrong syntax of arguments: Concat\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1020,7 +1208,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Memory Allocation Error: concat ---> copy_array\n");
+                printf("Memory Allocation Error: concat ---> copy_array\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1028,7 +1216,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Memory Allocation Error: concat ---> concat_arrays\n");
+                printf("Memory Allocation Error: concat ---> concat_arrays\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1036,11 +1224,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Concat ---> Done!\n");
+            printf("Concat ---> Done!\n\n");
         }else if(!strcmp(comm, "Free")){
-            comm_error = command_free(fin, arrays, comm);
+            comm_error = command_free(fin, arrays, comm, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Free\n");
+                printf("Wrong syntax of arguments: Free %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1048,7 +1236,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Memory Allocation Error: free ---> clear_specific_array\n");
+                printf("Memory Allocation Error: free %c ---> clear_specific_array\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1056,11 +1244,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Free ---> Done!\n");
+            printf("Free %c ---> Done!\n\n", name_out);
         }else if(!strcmp(comm, "Remove")){
-            comm_error = command_remove(fin, arrays, comm);
+            comm_error = command_remove(fin, arrays, comm, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Copy\n");
+                printf("Wrong syntax of arguments: Remove %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1068,7 +1256,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Remove arguments error: index < 0\n");
+                printf("Remove %c arguments error: index < 0\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1076,7 +1264,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Remove arguments error: count < 1\n");
+                printf("Remove %c arguments error: count < 1\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1084,7 +1272,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 4){
-                printf("Remove error: request to delete non-existent elements\n");
+                printf("Remove %c error: request to delete non-existent elements\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1092,7 +1280,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 5){
-                printf("Memory Allocation Error: remove ---> remove_from_array\n");
+                printf("Memory Allocation Error: remove %c ---> remove_from_array\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1100,11 +1288,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Remove ---> Done!\n");
+            printf("Remove %c ---> Done!\n\n", name_out);
         }else if(!strcmp(comm, "Copy")){
             comm_error = copy(fin, arrays, comm);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Copy\n");
+                printf("Wrong syntax of arguments: Copy\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1112,7 +1300,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Memory Allocation Error: copy ---> clear_specific_array\n");
+                printf("Memory Allocation Error: copy ---> clear_specific_array\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1136,7 +1324,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 5){
-                printf("Memory Allocation Error: copy ---> copy_array\n");
+                printf("Memory Allocation Error: copy ---> copy_array\n\n");
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1144,17 +1332,11 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Copy ---> Done!\n");
+            printf("Copy ---> Done!\n\n");
         }else if(!strcmp(comm, "Sort")){
-
-        }else if(!strcmp(comm, "Shuffle")){
-
-        }else if(!strcmp(comm, "Stats")){
-
-        }else if(!strcmp(comm, "Print")){
-            comm_error = print(fin, comm, arrays);
+            comm_error = sort(fin, comm, arrays, &sign, &name_out);
             if(comm_error == 1){
-                printf("Wrong syntax of arguments: Print\n");
+                printf("Wrong syntax of arguments: Sort %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1162,7 +1344,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 2){
-                printf("Memory Allocation Error: Print\n");
+                printf("Sort %c error: wrong syntax of a sign\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1170,31 +1352,7 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }else if(comm_error == 3){
-                printf("Wrong syntax of arguments: Print\n");
-                checker = -1;
-                clear_arrays_value(arrays, &checker);
-                free(comm);
-                fclose(fin);
-                comm_error = 0;
-                return 0;
-            }else if(comm_error == 4){
-                printf("Print ---> Range error: a > b\n");
-                checker = -1;
-                clear_arrays_value(arrays, &checker);
-                free(comm);
-                fclose(fin);
-                comm_error = 0;
-                return 0;
-            }else if(comm_error == 5){
-                printf("Print ---> Range error: at least one of borders less than 0\n");
-                checker = -1;
-                clear_arrays_value(arrays, &checker);
-                free(comm);
-                fclose(fin);
-                comm_error = 0;
-                return 0;
-            }else if(comm_error == 6){
-                printf("Print ---> Range error: at least one of borders points to a non-existent element\n");
+                printf("Memory Allocation Error: Sort %c\n\n", name_out);
                 checker = -1;
                 clear_arrays_value(arrays, &checker);
                 free(comm);
@@ -1202,9 +1360,127 @@ int main(int argc, char *argv[]){
                 comm_error = 0;
                 return 0;
             }
-            printf("Print ---> Done!\n");
+            printf("Sort %c(%c) ---> Done!\n\n", name_out, sign);
+        }else if(!strcmp(comm, "Shuffle")){
+            comm_error = shuffle(fin, comm, arrays, &name_out);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Shuffle %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: Shuffle %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Shuffle %c ---> Done!\n\n", name_out);
+        }else if(!strcmp(comm, "Stats")){
+            int max = 0;
+            int min = 0;
+            int index_max = 0;
+            int index_min = 0;
+            int max_count = 0;
+            double middle = 0.0;
+            double max_differ = 0.0;
+            int max_differ_num = 0;
+            int count = 0;
+            int count_of_elements = 0;
+
+            comm_error = stats(fin, comm, arrays, &max, &min, &index_max, &index_min, &max_count, &middle, &max_differ, &max_differ_num, &count, &name_out, &count_of_elements);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Stats %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: Stats %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Stats error: array %c is empty\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("--- Stats %c ---\n", name_out);
+            printf("1) Size: %d\n", count_of_elements);
+            printf("2) Min element: %d (index %d)\n", min, index_min);
+            printf("3) Max element: %d (index %d)\n", max, index_max);
+            printf("4) Most common element: %d (%d times)\n", max_count, count);
+            printf("5) Arithmetic mean of elements: %f\n", middle);
+            printf("6) Maximum deviation from the arithmetic mean: %f (element %d)\n", max_differ, max_differ_num);
+            printf("--- Stats done! ---\n\n");
+        }else if(!strcmp(comm, "Print")){
+            comm_error = print(fin, comm, arrays, &name_out);
+            if(comm_error == 1){
+                printf("Wrong syntax of arguments: Print %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 2){
+                printf("Memory Allocation Error: Print %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 3){
+                printf("Wrong syntax of arguments: Print %c\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 4){
+                printf("Print %c ---> Range error: a > b\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 5){
+                printf("Print %c ---> Range error: at least one of borders less than 0\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }else if(comm_error == 6){
+                printf("Print %c ---> Range error: at least one of borders points to a non-existent element\n\n", name_out);
+                checker = -1;
+                clear_arrays_value(arrays, &checker);
+                free(comm);
+                fclose(fin);
+                comm_error = 0;
+                return 0;
+            }
+            printf("Print %c ---> Done!\n\n", name_out);
         }else{
-            printf("Wrong command\n");
+            printf("Wrong command\n\n");
             checker = -1;
             clear_arrays_value(arrays, &checker);
             free(comm);
