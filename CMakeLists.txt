@@ -35,3 +35,5 @@ add_executable(l2_task_9
         lab_2/l2_task_9.c)
 add_executable(l4_task_4
         lab_4/l4_task_4.c)
+add_executable(l3_task_1
+        lab_3/l3_task_1.c)
