@@ -200,6 +200,31 @@ int check_date(int day, int month, int year){
     return 0;
 }
 
+int print_list(list* core){
+    list* output = core;
+    int n = 1;
+    while(1){
+        printf("%d) ", n++);
+        printf("%s ", output->name);
+        printf("%s ", output->surname);
+        printf("%s ", output->patronymic);
+        if(output->day < 10) printf("0%d.", output->day);
+        else printf("%d.", output->day);
+        if(output->month < 10) printf("0%d.", output->month);
+        else printf("%d.", output->month);
+        printf("%d ", output->year);
+        if(output->gender) printf("female ");
+        else printf("male ");
+        printf("%f\n", output->income);
+        if(output->next != NULL){
+            output = output->next;
+        }else{
+            break;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]){
     int counter_of_persons = 0;
     int comm_error;
@@ -382,33 +407,56 @@ int main(int argc, char *argv[]){
         counter_of_persons = 0;
         printf("Warning: List is empty\n");
     }
-
-
-
-
-
-    list* output = core;
-    int n = 1;
-    while(1){
-        printf("%d) ", n++);
-        printf("%s ", output->name);
-        printf("%s ", output->surname);
-        printf("%s ", output->patronymic);
-        if(output->day < 10) printf("0%d.", output->day);
-        else printf("%d.", output->day);
-        if(output->month < 10) printf("0%d.", output->month);
-        else printf("%d.", output->month);
-        printf("%d ", output->year);
-        if(output->gender) printf("female ");
-        else printf("male ");
-        printf("%f\n", output->income);
-        if(output->next != NULL){
-            output = output->next;
-        }else{
-            break;
+    int command = 0;
+    int e = 0;
+    while(command != 6){
+        printf("Choose a command:\n");
+        printf("1) Add a person\n");
+        printf("2) Remove a person\n");
+        printf("3) Find a person\n");
+        printf("4) Print a list\n");
+        printf("5) Save a list into file\n");
+        printf("6) Exit\n");
+        if(!scanf("%d", &command)){
+            printf("Invalid command\n");
+            e++;
+            if(e == 3){
+                printf("\n[Closing app...]\n");
+                free(gender);
+                clear_list(&core);
+                return 0;
+            }
         }
+        if(command == 1){
 
+        }else if(command == 2){
+
+        }else if(command == 3){
+
+        }else if(command == 4){
+
+        }else if(command == 5){
+
+        }else if(command == 6){
+
+        }else{
+            printf("Invalid command\n");
+            e++;
+            if(e == 3){
+                printf("\n[Closing app...]\n");
+                free(gender);
+                clear_list(&core);
+                return 0;
+            }
+        }
     }
+
+
+
+
+
+
+
     free(gender);
     clear_list(&core);
     return 0;

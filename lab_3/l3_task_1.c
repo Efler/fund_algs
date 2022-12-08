@@ -36,7 +36,8 @@ int main(){
     char* str = NULL;
     code = traverse(&str, num, scale);
     if (code == DONE){
-        printf("\nNumber %d was traversed to %s in base 2^%d = %d\n", num, str, scale, 1<<scale);
+        if(!str) printf("\nNumber %d was traversed to 0 in base 2^%d = %d\n", num, scale, 1<<scale);
+        else printf("\nNumber %d was traversed to %s in base 2^%d = %d\n", num, str, scale, 1<<scale);
         free(str);
     }
     else if (code == NO_MEMORY){
@@ -76,6 +77,9 @@ int traverse(char** str, int num, int r){
     char symb[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
     int bases[] = {0, 1, 3, 7, 15, 31};
     int flag = 0, ost;
+    if(!num){
+        return DONE;
+    }
     if (num < 0){
         flag = 1;
         num = -num;

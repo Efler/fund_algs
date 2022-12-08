@@ -866,6 +866,10 @@ int sort(FILE* fin, char* comm, arr* arrays, char* sign, char* name_out){
     }
     int index = find_array(arrays, Name);
     *sign = fgetc(fin);
+    if(arrays[index].count_of_el == 0){
+        c = fgetc(fin);
+        return 0;
+    }
     if(*sign == '+'){
         if(arrays[index].value_buff != arrays[index].count_of_el){
             int* p = (int*)realloc(arrays[index].value, (arrays[index].count_of_el)*sizeof(int));
@@ -906,6 +910,9 @@ int shuffle(FILE* fin, char* comm, arr* arrays, char* name_out){
     }
     int index = find_array(arrays, Name);
     c = fgetc(fin);
+    if(arrays[index].count_of_el == 0){
+        return 0;
+    }
     if(arrays[index].value_buff != arrays[index].count_of_el){
         int* p = (int*)realloc(arrays[index].value, (arrays[index].count_of_el)*sizeof(int));
         if(!p){
