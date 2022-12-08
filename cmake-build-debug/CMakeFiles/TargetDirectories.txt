@@ -16,5 +16,6 @@ D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles
 D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/l4_task_4.dir
 D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/l3_task_1.dir
 D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/l3_task_4.dir
+D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/l3_task_7.dir
 D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/edit_cache.dir
 D:/JetBrains/CLion 2022.2.3/CLionProjects/fund_algs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
