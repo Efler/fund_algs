@@ -131,21 +131,21 @@ int add(list** core, int count){
     list* new = *core;
     list* next;
     if(count > 2){
-        if((new->year)*10000+(new->month*100)+(new->day) > (new->next->year)*10000+(new->next->month*100)+(new->next->day)){
+        if(((new->year)*10000+(new->month*100)+(new->day)) > ((new->next->year)*10000+(new->next->month*100)+(new->next->day))){
             previous = new->next;
             next = previous->next;
             *core = previous;
         }else{
             return 0;
         }
-        while((new->year)*10000+(new->month*100)+(new->day) > (next->year)*10000+(next->month*100)+(next->day)){
+        while(((new->year)*10000+(new->month*100)+(new->day)) > ((next->year)*10000+(next->month*100)+(next->day))){
             if(next->next == NULL){
                 break;
             }
             previous = previous->next;
             next = previous->next;
         }
-        if(next->next == NULL){
+        if(next->next != NULL){
             previous->next = next;
             next->next = new;
             new->next = NULL;
@@ -156,6 +156,7 @@ int add(list** core, int count){
         return 0;
     }else if(count == 2){
         if((new->year)*10000+(new->month*100)+(new->day) > (new->next->year)*10000+(new->next->month*100)+(new->next->day)){
+            *core = new->next;
             new->next->next = new;
             new->next = NULL;
             return 0;
@@ -201,6 +202,7 @@ int check_date(int day, int month, int year){
 }
 
 int print_list(list* core){
+    printf("\n");
     list* output = core;
     int n = 1;
     while(1){
@@ -219,9 +221,138 @@ int print_list(list* core){
         if(output->next != NULL){
             output = output->next;
         }else{
+            printf("\n");
             break;
         }
     }
+    return 0;
+}
+
+int str_valid(char* str){
+    for(int i = 0; i < strlen(str); i++){
+        if(!isalpha(str[i])){
+            free(str);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int int_valid(char* str){
+    for(int i = 0; i < strlen(str); i++){
+        if(!isdigit(str[i])){
+            free(str);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int d_valid(char* str){
+    for(int i = 0; i < strlen(str); i++){
+        if(!isdigit(str[i]) && str[i] != '.'){
+            free(str);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int input_str(char** str){
+    fflush(stdin);
+    char c;
+    int k = 2;
+    *str = (char*)malloc(k*sizeof(char));
+    char* p_str = *str;
+    if(!*str) return 1;
+    while((c = getchar()) != '\n'){
+        if(p_str - *str == k-1){
+            k*=2;
+            char* p = (char*)realloc(*str, k*sizeof(char));
+            if(!p){
+                free(*str);
+                return 1;
+            }else{
+                *str = p;
+                p_str = *str + (k/2)-1;
+            }
+        }
+        *p_str++ = c;
+    }
+    *p_str = 0;
+    fflush(stdin);
+    return 0;
+}
+
+int command_add(list* input){
+    int error = 0;
+    char* name;
+    char* surname;
+    char* patronymic;
+    char* day;
+    char* month;
+    char* year;
+    int gender;
+    char* income;
+
+    printf("\nName:\n");
+    error = input_str(&name);
+    if(error) return 2;
+    if(str_valid(name)) return 1;
+    input->name = name;
+
+    printf("Surname:\n");
+    error = input_str(&surname);
+    if(error) return 2;
+    if(str_valid(surname)) return 1;
+    input->surname = surname;
+
+    printf("Patronymic:\n");
+    error = input_str(&patronymic);
+    if(error) return 2;
+    if(str_valid(patronymic)) return 1;
+    input->patronymic = patronymic;
+
+    printf("Day of birth:\n");
+    error = input_str(&day);
+    if(error) return 2;
+    if(int_valid(day)) return 1;
+    if(atoi(day) < 1 || atoi(day) > 31) return 3;
+    input->day = atoi(day);
+
+    printf("Month of birth:\n");
+    error = input_str(&month);
+    if(error) return 2;
+    if(int_valid(month)) return 1;
+    if(atoi(month) < 1 || atoi(month) > 12) return 3;
+    input->month = atoi(month);
+
+    printf("Year of birth:\n");
+    error = input_str(&year);
+    if(error) return 2;
+    if(int_valid(year)) return 1;
+    if(atoi(year) < 2000) return 3;
+    input->year = atoi(year);
+
+    if(check_date(input->day, input->month, input->year)) return 3;
+
+    printf("Choose a gender:\n");
+    printf("1) Male\n");
+    printf("2) Female\n");
+    scanf("%d", &gender);
+    if(gender == 1) input->gender = 0;
+    else if(gender == 2) input->gender = 1;
+    else{
+        fflush(stdin);
+        return 4;
+    }
+
+    printf("Income (only with dot):\n");
+    error = input_str(&income);
+    if(error) return 2;
+    if(d_valid(income)) return 1;
+    input->income = atof(income);
+
     return 0;
 }
 
@@ -374,15 +505,17 @@ int main(int argc, char *argv[]){
             printf("Error -> read_str: memory allocation error\n");
             return 0;
         }
-        if(!strcmp(gender, male)) input->gender = 0;
-        else if(!strcmp(gender, female)) input->gender = 1;
-        else{
-            if(!feof(fin)){
-                free(gender);
-                clear_list(&core);
-                fclose(fin);
-                printf("Error: invalid gender\n");
-                return 0;
+        if(gender != NULL){
+            if(!strcmp(gender, male)) input->gender = 0;
+            else if(!strcmp(gender, female)) input->gender = 1;
+            else{
+                if(!feof(fin)){
+                    free(gender);
+                    clear_list(&core);
+                    fclose(fin);
+                    printf("Error: invalid gender\n");
+                    return 0;
+                }
             }
         }
         comm_error = read_double(fin, &input->income);
@@ -405,57 +538,87 @@ int main(int argc, char *argv[]){
     fclose(fin);
     if(core->gender == -1){
         counter_of_persons = 0;
-        printf("Warning: List is empty\n");
+        printf("[ Warning: List is empty ]\n\n");
     }
     int command = 0;
     int e = 0;
     while(command != 6){
         printf("Choose a command:\n");
-        printf("1) Add a person\n");
-        printf("2) Remove a person\n");
-        printf("3) Find a person\n");
-        printf("4) Print a list\n");
-        printf("5) Save a list into file\n");
-        printf("6) Exit\n");
+        printf("1: Add a person\n");
+        printf("2: Remove a person\n");
+        printf("3: Find a person\n");
+        printf("4: Print a list\n");
+        printf("5: Save a list into file\n");
+        printf("6: Exit\n");
         if(!scanf("%d", &command)){
-            printf("Invalid command\n");
+            printf("\nInvalid command\n\n");
             e++;
             if(e == 3){
                 printf("\n[Closing app...]\n");
                 free(gender);
                 clear_list(&core);
                 return 0;
+            }else{
+                fflush(stdin);
+                continue;
             }
         }
         if(command == 1){
-
+            if(counter_of_persons == 0) input = core;
+            else{
+                if(create_new(&core)){
+                    free(gender);
+                    printf("Error -> create_new: memory allocation error\n");
+                    clear_list(&core);
+                    return 0;
+                }
+                input = core;
+            }
+            comm_error = command_add(input);
+            if(comm_error == 1){
+                printf("Invalid input!\n\n");
+                break;
+            }else if(comm_error == 2){
+                printf("Memory allocation error!\n\n");
+                break;
+            }else if(comm_error == 3) {
+                printf("Invalid date!");
+                break;
+            }else if(comm_error == 4) {
+                printf("Invalid gender!");
+                break;
+            }
+            counter_of_persons++;
+            add(&core, counter_of_persons);
+            comm_error = 0;
+            printf("\n[ Add ---> done! ]\n\n");
         }else if(command == 2){
 
         }else if(command == 3){
 
         }else if(command == 4){
-
+            if(counter_of_persons == 0) printf("\nList is empty!\n\n");
+            else print_list(core);
+            printf("[ Print ---> done! ]\n\n");
+            command = 0;
         }else if(command == 5){
 
         }else if(command == 6){
-
+            break;
         }else{
-            printf("Invalid command\n");
+            printf("\nInvalid command\n\n");
             e++;
             if(e == 3){
                 printf("\n[Closing app...]\n");
                 free(gender);
                 clear_list(&core);
                 return 0;
+            }else{
+                fflush(stdin);
+                continue;
             }
         }
     }
-
-
-
-
-
-
 
     free(gender);
     clear_list(&core);
