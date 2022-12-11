@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <math.h>
 #define EPSILON 1e-7
 
 
@@ -129,35 +130,32 @@ int create_new(list** core) {
 int add(list** core, int count){
     list* previous;
     list* new = *core;
-    list* next;
+    list* next = new->next;
     if(count > 2){
-        if(((new->year)*10000+(new->month*100)+(new->day)) > ((new->next->year)*10000+(new->next->month*100)+(new->next->day))){
+        if((((new->year)*10000)+((new->month)*100)+(new->day)) > (((next->year)*10000)+((next->month)*100)+(next->day))){
             previous = new->next;
             next = previous->next;
             *core = previous;
         }else{
             return 0;
         }
-        while(((new->year)*10000+(new->month*100)+(new->day)) > ((next->year)*10000+(next->month*100)+(next->day))){
+        while((((new->year)*10000)+((new->month)*100)+(new->day)) > (((next->year)*10000)+((next->month)*100)+(next->day))){
             if(next->next == NULL){
-                break;
+                previous->next = next;
+                next->next = new;
+                new->next = NULL;
+                return 0;
             }
             previous = previous->next;
             next = previous->next;
-        }
-        if(next->next != NULL){
-            previous->next = next;
-            next->next = new;
-            new->next = NULL;
-            return 0;
         }
         previous->next = new;
         new->next = next;
         return 0;
     }else if(count == 2){
-        if((new->year)*10000+(new->month*100)+(new->day) > (new->next->year)*10000+(new->next->month*100)+(new->next->day)){
-            *core = new->next;
-            new->next->next = new;
+        if((((new->year)*10000)+((new->month)*100)+(new->day)) > (((next->year)*10000)+((next->month)*100)+(next->day))){
+            *core = next;
+            next->next = new;
             new->next = NULL;
             return 0;
         }
@@ -172,22 +170,16 @@ void clear_list(list** core){
     while(1){
         tmp = *core;
         if(tmp->next == NULL){
-            tmp->name = NULL;
             free(tmp->name);
-            tmp->surname = NULL;
             free(tmp->surname);
-            tmp->patronymic = NULL;
             free(tmp->patronymic);
             free(tmp);
             printf("\n[ List cleared (dynamic memory) ]\n\n");
             break;
         }
         *core = tmp->next;
-        tmp->name = NULL;
         free(tmp->name);
-        tmp->surname = NULL;
         free(tmp->surname);
-        tmp->patronymic = NULL;
         free(tmp->patronymic);
         free(tmp);
     }
@@ -353,6 +345,233 @@ int command_add(list* input){
     if(d_valid(income)) return 1;
     input->income = atof(income);
 
+    return 0;
+}
+
+int remove_person(list** core, int n, int counter_of_persons){
+    list* person;
+    list* previous;
+    if(counter_of_persons == 1){
+        (*core)->name = NULL;
+        (*core)->surname = NULL;
+        (*core)->patronymic = NULL;
+        (*core)->day = -1;
+        (*core)->month = -1;
+        (*core)->year = -1;
+        (*core)->gender = -1;
+        (*core)->income = -1.0;
+        (*core)->next = NULL;
+        return 0;
+    }else{
+        if(n == 1){
+            list* tmp = *core;
+            *core = (*core)->next;
+            free(tmp->name);
+            free(tmp->surname);
+            free(tmp->patronymic);
+            free(tmp);
+            return 0;
+        }else{
+            person = *core;
+            for(int i = 1; i < n; i++){
+                previous = person;
+                person = person->next;
+            }
+            previous->next = person->next;
+            free(person->name);
+            free(person->surname);
+            free(person->patronymic);
+            free(person);
+            return 0;
+        }
+    }
+    return 0;
+}
+
+int print_certain_person(list* output, int n){
+    printf("%d) ", n);
+    printf("%s ", output->name);
+    printf("%s ", output->surname);
+    printf("%s ", output->patronymic);
+    if(output->day < 10) printf("0%d.", output->day);
+    else printf("%d.", output->day);
+    if(output->month < 10) printf("0%d.", output->month);
+    else printf("%d.", output->month);
+    printf("%d ", output->year);
+    if(output->gender) printf("female ");
+    else printf("male ");
+    printf("%f\n", output->income);
+    return 0;
+}
+
+int find_name(list* core){
+    list* person = core;
+    char* name;
+    int error = 0;
+    error = input_str(&name);
+    if(error) return 1;
+    error = 0;
+    while(person != NULL){
+        if(!strcmp(person->name, name)){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    free(name);
+    return 0;
+}
+
+int find_surname(list* core){
+    list* person = core;
+    char* surname;
+    int error = 0;
+    error = input_str(&surname);
+    if(error) return 1;
+    error = 0;
+    while(person != NULL){
+        if(!strcmp(person->surname, surname)){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    free(surname);
+    return 0;
+}
+
+int find_patronymic(list* core){
+    list* person = core;
+    char* patronymic;
+    int error = 0;
+    error = input_str(&patronymic);
+    if(error) return 1;
+    error = 0;
+    while(person != NULL){
+        if(!strcmp(person->patronymic, patronymic)){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    free(patronymic);
+    return 0;
+}
+
+int find_day_of_birth(list* core){
+    list* person = core;
+    char* day;
+    char* month;
+    char* year;
+    int error = 0;
+
+    printf("\nDay of birth:\n");
+    error = input_str(&day);
+    if(error) return 1;
+
+    printf("Month of birth:\n");
+    error = input_str(&month);
+    if(error) return 1;
+
+    printf("Year of birth:\n");
+    error = input_str(&year);
+    if(error) return 1;
+
+    error = 0;
+    while(person != NULL){
+        if(person->day == atoi(day) && person->month == atoi(month) && person->year == atoi(year)){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    free(day);
+    free(month);
+    free(year);
+    return 0;
+}
+
+int find_gender(list* core){
+    list* person = core;
+    int gender;
+    int error = 0;
+
+    printf("\nChoose a gender:\n");
+    printf("1) Male\n");
+    printf("2) Female\n");
+    scanf("%d", &gender);
+    gender -= 1;
+
+    while(person != NULL){
+        if(person->gender == gender){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    return 0;
+}
+
+int find_income(list* core){
+    list* person = core;
+    char* str_income;
+    double income;
+    int error = 0;
+
+    error = input_str(&str_income);
+    if(error) return 1;
+    income = atof(str_income);
+
+    error = 0;
+    while(person != NULL){
+        if(fabs(person->income - income) < EPSILON){
+            error++;
+            print_certain_person(person, error);
+        }
+        person = person->next;
+    }
+    if(!error) printf("\nPersons with entered parameter are not found\n\n");
+    else printf("\n");
+    free(str_income);
+    return 0;
+}
+
+int write_list(FILE* fin, list* core){
+    list* output = core;
+    while(output != NULL){
+        for(int i = 0; i < strlen(output->name); i++){
+            fputc(*(output->name + i), fin);
+        }
+        fputc(' ', fin);
+        for(int i = 0; i < strlen(output->surname); i++){
+            fputc(*(output->surname + i), fin);
+        }
+        fputc(' ', fin);
+        for(int i = 0; i < strlen(output->patronymic); i++){
+            fputc(*(output->patronymic + i), fin);
+        }
+        fputc(' ', fin);
+        if(output->day < 10) fprintf(fin, "0%d.", output->day);
+        else fprintf(fin, "%d.", output->day);
+        if(output->month < 10) fprintf(fin, "0%d.", output->month);
+        else fprintf(fin, "%d.", output->month);
+        fprintf(fin, "%d ", output->year);
+        if(output->gender) fprintf(fin, "female ");
+        else fprintf(fin, "male ");
+        if(output->next == NULL) fprintf(fin, "%f", output->income);
+        else fprintf(fin, "%f\n", output->income);
+        output = output->next;
+    }
     return 0;
 }
 
@@ -593,16 +812,91 @@ int main(int argc, char *argv[]){
             comm_error = 0;
             printf("\n[ Add ---> done! ]\n\n");
         }else if(command == 2){
-
+            if(counter_of_persons == 0){
+                printf("\nList is empty!\n\n");
+                continue;
+            }
+            printf("\nChoose a number of person to delete:\n");
+            print_list(core);
+            printf("\nNumber:\n");
+            int n = 0;
+            scanf("%d", &n);
+            if(n < 1 || n > counter_of_persons){
+                printf("\nInvalid number\n\n");
+                fflush(stdin);
+                continue;
+            }
+            remove_person(&core, n, counter_of_persons);
+            counter_of_persons--;
+            printf("[ Delete ---> done! ]\n\n");
         }else if(command == 3){
-
+            if(counter_of_persons == 0){
+                printf("\nList is empty!\n\n");
+                continue;
+            }
+            printf("\nChoose a parameter to find:\n");
+            printf("1) Name\n");
+            printf("2) Surname\n");
+            printf("3) Patronymic\n");
+            printf("4) Date of birth\n");
+            printf("5) Gender\n");
+            printf("6) Income\n");
+            int n = 0;
+            scanf("%d", &n);
+            if(n < 1 || n > 6){
+                printf("\nInvalid number of parameter\n\n");
+                fflush(stdin);
+                continue;
+            }
+            if(n == 1){
+                printf("\nName:\n");
+                if(find_name(core)){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+            }else if(n == 2){
+                printf("\nSurname:\n");
+                if(find_surname(core)){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+            }else if(n == 3){
+                printf("\nPatronymic:\n");
+                if(find_patronymic(core)){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+            }else if(n == 4){
+                if(find_day_of_birth(core)){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+            }else if(n == 5){
+                find_gender(core);
+            }else if(n == 6){
+                printf("\nIncome (only with dot):\n");
+                if(find_income(core)){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+            }
+            printf("[ Find ---> done! ]\n\n");
+            command = 0;
         }else if(command == 4){
             if(counter_of_persons == 0) printf("\nList is empty!\n\n");
             else print_list(core);
             printf("[ Print ---> done! ]\n\n");
             command = 0;
         }else if(command == 5){
-
+            fin = fopen(argv[1], "w");
+            if(!fin){
+                printf("Could not open a file\n");
+                break;
+            }
+            if(counter_of_persons) write_list(fin, core);
+            fclose(fin);
+            printf("\n[ Save ---> done! ]\n\n");
+            command = 0;
         }else if(command == 6){
             break;
         }else{
