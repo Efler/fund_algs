@@ -576,7 +576,7 @@ int write_list(FILE* fin, list* core){
 }
 
 int main(int argc, char *argv[]){
-    printf("\n --- Check README.txt before using app. Thank you! ---\n");
+    printf("\n --- Check README_l3_task_7.txt before using app. Thank you! ---\n");
     int counter_of_persons = 0;
     int comm_error;
     char* gender = NULL;
