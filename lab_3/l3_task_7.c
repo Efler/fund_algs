@@ -123,6 +123,9 @@ int create_new(list** core) {
         return 1;
     }
     tmp->next = (*core);
+    tmp->name = NULL;
+    tmp->surname = NULL;
+    tmp->patronymic = NULL;
     (*core) = tmp;
     return 0;
 }
@@ -170,17 +173,17 @@ void clear_list(list** core){
     while(1){
         tmp = *core;
         if(tmp->next == NULL){
-            free(tmp->name);
-            free(tmp->surname);
-            free(tmp->patronymic);
+            if(tmp->name != NULL) free(tmp->name);
+            if(tmp->surname != NULL) free(tmp->surname);
+            if(tmp->patronymic != NULL) free(tmp->patronymic);
             free(tmp);
             printf("\n[ List cleared (dynamic memory) ]\n\n");
             break;
         }
         *core = tmp->next;
-        free(tmp->name);
-        free(tmp->surname);
-        free(tmp->patronymic);
+        if(tmp->name != NULL) free(tmp->name);
+        if(tmp->surname != NULL) free(tmp->surname);
+        if(tmp->patronymic != NULL) free(tmp->patronymic);
         free(tmp);
     }
 }
