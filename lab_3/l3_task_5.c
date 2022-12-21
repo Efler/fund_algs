@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#define EPSILON 1e-7
 
 
 enum{
@@ -219,6 +220,14 @@ int read_file(list** students, int* k, FILE* fin, int* counter_of_persons){
     return DONE;
 }
 
+double find_stud_average(int* marks){
+    double sum = 0.0;
+    for(int i = 0; i < 5; i++){
+        sum += marks[i];
+    }
+    return sum/5;
+}
+
 int print_all_students(list* students, int counter_of_persons){
     printf("\n");
     if(counter_of_persons == 0){
@@ -229,9 +238,9 @@ int print_all_students(list* students, int counter_of_persons){
         printf("%d %s %s ", students[i].id, students[i].name, students[i].surname);
         printf("%d %s ", students[i].course, students[i].group);
         for(int l = 0; l < 5; l++){
-            if(l == 4) printf("%d\n", students[i].marks[l]);
-            else printf("%d ", students[i].marks[l]);
+            printf("%d ", students[i].marks[l]);
         }
+        printf("(average: %f)\n", find_stud_average(students[i].marks));
     }
     return DONE;
 }
@@ -406,6 +415,153 @@ int compare_group(const void* x_void, const void* y_void){
     return strcmp(x, y);
 }
 
+char* make_path(char* old_path, int num){
+    char* path = (char*)malloc((strlen(old_path)+3)*sizeof(char));
+    if(!path){
+        return NULL;
+    }
+    int id = strlen(old_path)+2;
+    strcpy(path, old_path);
+    while(path[id] != '.'){
+        id--;
+    }
+    path[id++] = '_';
+    path[id++] = (char)(48 + num);
+    path[id++] = '.';
+    path[id++] = 't';
+    path[id++] = 'x';
+    path[id++] = 't';
+    path[id] = 0;
+    return path;
+}
+
+double find_average(list* students, int counter_of_persons){
+    int sum;
+    double avr = 0.0;
+    for(int i = 0; i < counter_of_persons; i++){
+        sum = 0;
+        for(int l = 0; l < 5; l++){
+            sum += students[i].marks[l];
+        }
+        avr = avr + (sum/5);
+    }
+    return avr/counter_of_persons;
+}
+
+void write_student(FILE* fout, list* students, int l){
+    fprintf(fout, "%d %s %s ", students[l].id, students[l].name, students[l].surname);
+    fprintf(fout, "%d %s ", students[l].course, students[l].group);
+    for(int i = 0; i < 5; i++){
+        if(i == 4) fprintf(fout, "%d\n", students[l].marks[i]);
+        else fprintf(fout, "%d ", students[l].marks[i]);
+    }
+}
+
+void print_groups(list** courses, int c1, int c2, int c3, int c4){
+    int k;
+    for(int i = 0; i < 4; i++){
+        if(courses[i] != NULL){
+            printf("\n-- %d course: --\n", i+1);
+            if(i == 0) k = c1;
+            else if(i == 1) k = c2;
+            else if(i == 2) k = c3;
+            else if(i == 3) k = c4;
+            for(int l = 0; l < k; l++){
+                printf("%d %s %s ", (courses[i])[l].id, (courses[i])[l].name, (courses[i])[l].surname);
+                printf("%d %s ", (courses[i])[l].course, (courses[i])[l].group);
+                for(int s = 0; s < 5; s++){
+                    if(s == 4) printf("%d\n", (courses[i])[l].marks[s]);
+                    else printf("%d ", (courses[i])[l].marks[s]);
+                }
+            }
+            printf("\n");
+        }
+    }
+}
+
+list** group_students(list* students, int counter_of_persons, int* c1, int* c2, int* c3, int* c4){
+    list** courses = (list**)malloc(4*sizeof(list*));
+    if(!courses){
+        return NULL;
+    }
+    for(int i = 0; i < counter_of_persons; i++){
+        if(students[i].course == 1) (*c1)++;
+        else if(students[i].course == 2) (*c2)++;
+        else if(students[i].course == 3) (*c3)++;
+        else (*c4)++;
+    }
+    list* course1 = (list*)malloc((*c1)*sizeof(list));
+    if(!course1){
+        free(courses);
+        return NULL;
+    }
+    if((*c1) != 0) courses[0] = course1;
+    else{
+        free(course1);
+        course1 = NULL;
+        courses[0] = course1;
+    }
+    list* course2 = (list*)malloc((*c2)*sizeof(list));
+    if(!course2){
+        free(course1);
+        free(courses);
+        return NULL;
+    }
+    if((*c2) != 0) courses[1] = course2;
+    else{
+        free(course2);
+        course2 = NULL;
+        courses[1] = course2;
+    }
+    list* course3 = (list*)malloc((*c3)*sizeof(list));
+    if(!course3){
+        free(course1);
+        free(course2);
+        free(courses);
+        return NULL;
+    }
+    if((*c3) != 0) courses[2] = course3;
+    else{
+        free(course3);
+        course3 = NULL;
+        courses[2] = course3;
+    }
+    list* course4 = (list*)malloc((*c4)*sizeof(list));
+    if(!course4){
+        free(course1);
+        free(course2);
+        free(course3);
+        free(courses);
+        return NULL;
+    }
+    if((*c4) != 0) courses[3] = course4;
+    else{
+        free(course4);
+        course4 = NULL;
+        courses[3] = course4;
+    }
+    (*c1) = 0; (*c2) = 0; (*c3) = 0; (*c4) = 0;
+    for(int i = 0; i < counter_of_persons; i++){
+        if(students[i].course == 1){
+            course1[(*c1)] = students[i];
+            (*c1)++;
+        }
+        else if(students[i].course == 2){
+            course2[(*c2)] = students[i];
+            (*c2)++;
+        }
+        else if(students[i].course == 3){
+            course3[(*c3)] = students[i];
+            (*c3)++;
+        }
+        else if(students[i].course == 4){
+            course4[(*c4)] = students[i];
+            (*c4)++;
+        }
+    }
+    return courses;
+}
+
 int main(int argc, char *argv[]){
     int counter_of_persons = 0;
     int comm_error;
@@ -544,9 +700,45 @@ int main(int argc, char *argv[]){
             printf("\n[ Print ---> done! ]\n\n");
             action = 0;
         }else if(action == 4){
-
+            int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+            list** courses = group_students(students, counter_of_persons, &c1, &c2, &c3, &c4);
+            if(courses == NULL) break;
+            print_groups(courses, c1, c2, c3, c4);
+            free(courses[0]);
+            free(courses[1]);
+            free(courses[2]);
+            free(courses[3]);
+            free(courses);
+            printf("\n[ Group ---> done! ]\n\n");
+            action = 0;
         }else if(action == 5){
-
+            double avr = find_average(students, counter_of_persons);
+            for(int i = 1; i < 5; i++){
+                char* path = make_path(argv[1], i);
+                if(!path){
+                    printf("Memory allocation error!\n\n");
+                    break;
+                }
+                FILE* fout = fopen(path, "w");
+                if(!fout){
+                    printf("Could not create a file %s", path);
+                    free(path);
+                    break;
+                }
+                for(int l = 0; l < counter_of_persons; l++){
+                    if(students[l].course == i){
+                        if((find_stud_average(students[l].marks)-avr)>EPSILON){
+                            printf("\n%d %s %f ---> %d course\n", students[l].id, students[l].name, find_stud_average(students[l].marks), i);
+                            write_student(fout, students, l);
+                        }
+                    }
+                }
+                fclose(fout);
+                free(path);
+            }
+            printf("\n[ Average ---> %f ]\n\n", avr);
+            printf("\n[ Save ---> done! ]\n\n");
+            action = 0;
         }else if(action == 6){
             break;
         }else{
