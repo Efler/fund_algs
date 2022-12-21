@@ -13,6 +13,8 @@ add_executable(task_4
         lab_1/task_4.c)
 add_executable(task_5
         lab_1/task_5.c)
+add_executable(task_6
+        lab_1/task_6.c)
 add_executable(task_3
         lab_1/task_3.c)
 add_executable(task_8
