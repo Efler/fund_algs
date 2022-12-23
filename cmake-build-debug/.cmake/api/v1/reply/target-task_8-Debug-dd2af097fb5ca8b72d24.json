@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "l2_task_5.exe"
+			"path" : "task_8.exe"
 		},
 		{
-			"path" : "l2_task_5.pdb"
+			"path" : "task_8.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -27,7 +27,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 28,
+				"line" : 22,
 				"parent" : 0
 			}
 		]
@@ -59,7 +59,7 @@
 			]
 		}
 	],
-	"id" : "l2_task_5::@6890427a1f51a3e7e1df",
+	"id" : "task_8::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -79,8 +79,8 @@
 		],
 		"language" : "C"
 	},
-	"name" : "l2_task_5",
-	"nameOnDisk" : "l2_task_5.exe",
+	"name" : "task_8",
+	"nameOnDisk" : "task_8.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -101,7 +101,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "lab_2/l2_task_5.c",
+			"path" : "lab_1/task_8.c",
 			"sourceGroupIndex" : 0
 		}
 	],

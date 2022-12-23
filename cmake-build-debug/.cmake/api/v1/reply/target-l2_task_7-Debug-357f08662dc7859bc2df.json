@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "l3_task_7.exe"
+			"path" : "l2_task_7.exe"
 		},
 		{
-			"path" : "l3_task_7.pdb"
+			"path" : "l2_task_7.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -27,7 +27,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 44,
+				"line" : 34,
 				"parent" : 0
 			}
 		]
@@ -59,7 +59,7 @@
 			]
 		}
 	],
-	"id" : "l3_task_7::@6890427a1f51a3e7e1df",
+	"id" : "l2_task_7::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -79,8 +79,8 @@
 		],
 		"language" : "C"
 	},
-	"name" : "l3_task_7",
-	"nameOnDisk" : "l3_task_7.exe",
+	"name" : "l2_task_7",
+	"nameOnDisk" : "l2_task_7.exe",
 	"paths" : 
 	{
 		"build" : ".",
@@ -101,7 +101,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "lab_3/l3_task_7.c",
+			"path" : "lab_2/l2_task_7.c",
 			"sourceGroupIndex" : 0
 		}
 	],
