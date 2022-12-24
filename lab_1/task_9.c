@@ -149,6 +149,7 @@ int main(int argc, char *argv[]){
     int flag = 1;
     int num = 0;
     int max = 0;
+    int enter = 0;
     int error = DONE;
     while(flag){
         printf("\nEnter a number or a command 'Stop':\n");
@@ -159,6 +160,7 @@ int main(int argc, char *argv[]){
         }
         if(!strcmp(buff, "Stop")) flag = 0;
         else{
+            enter++;
             if(max_degree(buff) > base){
                 printf("\nWrong number in entered base\n");
                 free(buff);
@@ -169,6 +171,11 @@ int main(int argc, char *argv[]){
             free(buff);
             buff = NULL;
         }
+    }
+    if(!enter){
+        printf("\nNo input!\n");
+        free(buff);
+        return DONE;
     }
     printf("\nMax number in base 10 = %d\n", max);
     for(int i = 0; i < 4; i++){
