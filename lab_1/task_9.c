@@ -14,6 +14,11 @@ int traverse_num(char** str, int num, int base){
     int k = 4;
     *str = (char*)malloc(k * sizeof(char));
     if(!*str) return MEMORY;
+    if(num == 0){
+        (*str)[0] = '0';
+        (*str)[1] = 0;
+        return DONE;
+    }
     int index = 0;
     int ost = base;
     while(num){
@@ -147,7 +152,7 @@ int main(int argc, char *argv[]){
     }
     char* buff;
     int flag = 1;
-    int num = 0;
+    int num;
     int max = 0;
     int enter = 0;
     int error = DONE;
@@ -179,22 +184,15 @@ int main(int argc, char *argv[]){
     }
     printf("\nMax number in base 10 = %d\n", max);
     for(int i = 0; i < 4; i++){
-        if(!num){
-            printf("\nMax number in base %d = %d\n", bases[i], 0);
+        error = traverse_num(&buff, max, bases[i]);
+        if(error){
+            printf("%s", errors[error-1]);
             free(buff);
-            buff = NULL;
+            return error;
         }
-        else{
-            error = traverse_num(&buff, max, bases[i]);
-            if(error){
-                printf("%s", errors[error-1]);
-                free(buff);
-                return error;
-            }
-            printf("\nMax number in base %d = %s\n", bases[i], buff);
-            free(buff);
-            buff = NULL;
-        }
+        printf("\nMax number in base %d = %s\n", bases[i], buff);
+        free(buff);
+        buff = NULL;
     }
     return DONE;
 }
