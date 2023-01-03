@@ -26,6 +26,7 @@ typedef struct node{
     double key;
     employee person;
     int rank;
+    int children;
 }node;
 
 
@@ -210,6 +211,7 @@ node* create_heap(employee person){
     core->key = person.income;
     core->person = person;
     core->rank = 0;
+    core->children = 0;
     return core;
 }
 
@@ -232,6 +234,7 @@ node* add_to_heap(node* core, employee person){
         new->key = person.income;
         new->person = person;
         new->rank = 0;
+        new->children = 0;
         core->next = new;
         core->prev = new;
     }else{
@@ -243,12 +246,272 @@ node* add_to_heap(node* core, employee person){
         new->key = person.income;
         new->person = person;
         new->rank = 0;
+        new->children = 0;
     }
     if(new->key - core->key < EPSILON){
         return new;
     }else{
         return core;
     }
+}
+
+employee extract_min(node** core, int heap_count, int* error){
+    employee out = (*core)->person;
+    node* new;
+    if((*core)->next != NULL && (*core)->next->next == (*core)){
+        if((*core)->rank != 0){
+            int i = (*core)->children;
+            node* tmp = (*core)->deep;
+            for(int n = 0; n < i; n++) {
+                node *tmp2 = tmp->next;
+                tmp->next = (*core)->next;
+                if (n == i - 1) {
+                    tmp->prev = (*core)->prev;
+                } else {
+                    tmp->prev = (*core);
+                }
+                tmp = tmp2;
+            }
+            new = (*core)->next;
+        }else{
+            (*core)->next->next = NULL;
+            (*core)->next->prev = NULL;
+            new = (*core)->next;
+        }
+    }else if((*core)->next == NULL){
+        if((*core)->rank != 0){
+            new = (*core)->deep;
+        }
+    }else{
+        if((*core)->rank != 0){
+            int i = (*core)->children;
+            node* tmp = (*core)->deep;
+            for(int n = 0; n < i; n++){
+                node* tmp2 = tmp->next;
+                tmp->next = (*core)->next;
+                if(n == i-1){
+                    tmp->prev = (*core)->prev;
+                }else{
+                    tmp->prev = (*core);
+                }
+                tmp = tmp2;
+            }
+            new = (*core)->next;
+        }else{
+            (*core)->next->prev = (*core)->prev;
+            (*core)->prev->next = (*core)->next;
+            new = (*core)->next;
+        }
+    }
+    free((*core));
+    int i = 0;
+    int m = heap_count;
+    while(m){
+        m /= 2;
+        i++;
+    }
+    i++;
+    node* arr[i+1];
+    for(int s = 0; s < i+1; s++) arr[s] = NULL;
+    node* save = new;
+    node* tmp;
+    int flag = 1;
+    while(new->next != save){
+        if(flag){
+            (*core) = new;
+            flag--;
+        }else{
+            if((new->key - (*core)->key) < EPSILON) (*core) = new;
+        }
+        if(arr[new->rank] != NULL){
+            if(arr[new->rank]->key - new->key < EPSILON){
+                if(arr[new->rank]->deep == NULL){
+                    tmp = new->next;
+                    new->next->prev = new->prev;
+                    new->prev->next = new->next;
+                    new->next = NULL;
+                    new->prev = NULL;
+                    arr[new->rank]->deep = new;
+                    arr[new->rank]->rank++;
+                    arr[new->rank]->children++;
+                    if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }else{
+                    if(arr[new->rank]->deep->next == NULL){
+                        tmp = new->next;
+                        new->next->prev = new->prev;
+                        new->prev->next = new->next;
+                        new->next = arr[new->rank]->deep;
+                        new->prev = arr[new->rank]->deep;
+                        arr[new->rank]->deep->next = new;
+                        arr[new->rank]->deep->prev = new;
+                        arr[new->rank]->rank++;
+                        arr[new->rank]->children++;
+                        if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                        arr[new->rank] = NULL;
+                        new = tmp;
+                    }else{
+                        tmp = new->next;
+                        new->next->prev = new->prev;
+                        new->prev->next = new->next;
+                        new->next = arr[new->rank]->deep->next;
+                        new->prev = arr[new->rank]->deep;
+                        arr[new->rank]->deep->next = new;
+                        arr[new->rank]->rank++;
+                        arr[new->rank]->children++;
+                        if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                        arr[new->rank] = NULL;
+                        new = tmp;
+                    }
+                }
+            }else if(new->key - arr[new->rank]->key < EPSILON){
+                if(new->deep == NULL){
+                    tmp = new->next;
+                    arr[new->rank]->next->prev = arr[new->rank]->prev;
+                    arr[new->rank]->prev->next = arr[new->rank]->next;
+                    arr[new->rank]->next = NULL;
+                    arr[new->rank]->prev = NULL;
+                    new->deep = arr[new->rank];
+                    new->rank++;
+                    new->children++;
+                    if(new->key - (*core)->key < EPSILON) (*core) = new;
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }else{
+                    if(new->deep->next == NULL){
+                        tmp = new->next;
+                        arr[new->rank]->next->prev = arr[new->rank]->prev;
+                        arr[new->rank]->prev->next = arr[new->rank]->next;
+                        arr[new->rank]->next = new->deep;
+                        arr[new->rank]->prev = new->deep;
+                        new->deep->next = arr[new->rank];
+                        new->deep->prev = arr[new->rank];
+                        new->rank++;
+                        new->children++;
+                        if(new->key - (*core)->key < EPSILON) (*core) = new;
+                        arr[new->rank] = NULL;
+                        new = tmp;
+                    }else{
+                        tmp = new->next;
+                        arr[new->rank]->next->prev = arr[new->rank]->prev;
+                        arr[new->rank]->prev->next = arr[new->rank]->next;
+                        arr[new->rank]->next = new->deep->next;
+                        arr[new->rank]->prev = new->deep;
+                        new->deep->next = arr[new->rank];
+                        new->rank++;
+                        new->children++;
+                        if(new->key - (*core)->key < EPSILON) (*core) = new;
+                        arr[new->rank] = NULL;
+                        new = tmp;
+                    }
+                }
+            }
+        }else{
+            arr[new->rank] = new;
+            tmp = new->next;
+            new = tmp;
+        }
+    }
+
+
+    if(flag){
+        (*core) = new;
+        flag--;
+    }else{
+        if((new->key - (*core)->key) < EPSILON) (*core) = new;
+    }
+    if(arr[new->rank] != NULL){
+        if(arr[new->rank]->key - new->key < EPSILON){
+            if(arr[new->rank]->deep == NULL){
+                tmp = new->next;
+                new->next->prev = new->prev;
+                new->prev->next = new->next;
+                new->next = NULL;
+                new->prev = NULL;
+                arr[new->rank]->deep = new;
+                arr[new->rank]->rank++;
+                arr[new->rank]->children++;
+                if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                arr[new->rank] = NULL;
+                new = tmp;
+            }else{
+                if(arr[new->rank]->deep->next == NULL){
+                    tmp = new->next;
+                    new->next->prev = new->prev;
+                    new->prev->next = new->next;
+                    new->next = arr[new->rank]->deep;
+                    new->prev = arr[new->rank]->deep;
+                    arr[new->rank]->deep->next = new;
+                    arr[new->rank]->deep->prev = new;
+                    arr[new->rank]->rank++;
+                    arr[new->rank]->children++;
+                    if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }else{
+                    tmp = new->next;
+                    new->next->prev = new->prev;
+                    new->prev->next = new->next;
+                    new->next = arr[new->rank]->deep->next;
+                    new->prev = arr[new->rank]->deep;
+                    arr[new->rank]->deep->next = new;
+                    arr[new->rank]->rank++;
+                    arr[new->rank]->children++;
+                    if(arr[new->rank]->key - (*core)->key < EPSILON) (*core) = arr[new->rank];
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }
+            }
+        }else if(new->key - arr[new->rank]->key < EPSILON){
+            if(new->deep == NULL){
+                tmp = new->next;
+                arr[new->rank]->next->prev = arr[new->rank]->prev;
+                arr[new->rank]->prev->next = arr[new->rank]->next;
+                arr[new->rank]->next = NULL;
+                arr[new->rank]->prev = NULL;
+                new->deep = arr[new->rank];
+                new->rank++;
+                new->children++;
+                if(new->key - (*core)->key < EPSILON) (*core) = new;
+                arr[new->rank] = NULL;
+                new = tmp;
+            }else{
+                if(new->deep->next == NULL){
+                    tmp = new->next;
+                    arr[new->rank]->next->prev = arr[new->rank]->prev;
+                    arr[new->rank]->prev->next = arr[new->rank]->next;
+                    arr[new->rank]->next = new->deep;
+                    arr[new->rank]->prev = new->deep;
+                    new->deep->next = arr[new->rank];
+                    new->deep->prev = arr[new->rank];
+                    new->rank++;
+                    new->children++;
+                    if(new->key - (*core)->key < EPSILON) (*core) = new;
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }else{
+                    tmp = new->next;
+                    arr[new->rank]->next->prev = arr[new->rank]->prev;
+                    arr[new->rank]->prev->next = arr[new->rank]->next;
+                    arr[new->rank]->next = new->deep->next;
+                    arr[new->rank]->prev = new->deep;
+                    new->deep->next = arr[new->rank];
+                    new->rank++;
+                    new->children++;
+                    if(new->key - (*core)->key < EPSILON) (*core) = new;
+                    arr[new->rank] = NULL;
+                    new = tmp;
+                }
+            }
+        }
+    }else{
+        arr[new->rank] = new;
+        tmp = new->next;
+        new = tmp;
+    }
+
+    return out;
 }
 
 int main(int argc, char *argv[]){
@@ -306,5 +569,13 @@ int main(int argc, char *argv[]){
         }
     }
 
+    employee out;
+    while(heap_count > 0){
+        out = extract_min(&core, heap_count, &read_error);
+        printf("\n%d", out.id);
+        heap_count--;
+    }
 
+    free_list(list, counter_of_persons);
+    return DONE;
 }
