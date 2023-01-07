@@ -716,10 +716,10 @@ int main(int argc, char *argv[]){
         return OPENFILE;
     }
     while(heap_count > 0){
+        if(heap_count == 1) last_employee++;
         out = extract_node(&core, heap_count, mode);
         write_employee(fout, out, last_employee);
         heap_count--;
-        if(heap_count == 1) last_employee++;
     }
     printf("\n[ Writing into file ---> Done! (%s) ]\n", argv[3]);
 
