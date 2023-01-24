@@ -1,284 +1,240 @@
-#include <math.h>
+#include <stdlib.h>
 #include <stdio.h>
-#define EPSILON 1e-7
+#include <math.h>
 
-double fact(double n){
-    if (n == 0 || n==1)
+
+long double limit(long double lim(int n), double eps) {
+    int i = 1 / eps / eps, step = 1 / eps;
+    long double res = 0, prevRes = 0;
+    eps *= eps;
+    while (fabs(res - prevRes) > eps || prevRes == 0) {
+        prevRes = res;
+        res = lim(i += step);
+    }
+    return res;
+}
+
+long double sum(long double function(int n), double eps, int start) {
+    long double res = 0, prevRes = 0;
+    for (start; (fabs(res - prevRes) > eps || fabs(prevRes) < eps || (res - prevRes == 0)); start++) {
+        prevRes = res;
+        res += function(start);
+    }
+    return res;
+}
+
+long double multipl(long double function(int n), double eps, int start) {
+    long double res = 1, prevRes = 0, epsFunc = eps / 10;
+    for (start; fabs(prevRes - res) > epsFunc || fabs(prevRes) < eps; start++) {
+        prevRes = res;
+        res *= function(start);
+    }
+    return res;
+}
+
+long double factorial(int num) {
+    if (num == 0) {
         return 1;
-    else{
-        return n * fact(n - 1);
     }
+    int res = 1;
+    while (num > 0) {
+        res *= num;
+        num--;
+    }
+    return res;
 }
 
-int isPrime(int n){
-    int i;
-    for (i=2; i<=sqrt(n); i++)
-        if ((n % i) == 0) return 0;
-    return 1;
+long double eLim(int n) {
+    return pow(1 + 1.0 / n, n);
 }
 
-double lim_e(double eps){
-    double n = 1;
-    double an = pow(1+1/n, n);
-    double an_1 = pow(1+1/(n+1), n+1);
-    while(eps < fabs(an_1 - an)){
-        n = n + 1;
-        an = an_1;
-        an_1 = pow(1+1/(n+1), n+1);
+long double piLim(int n) {
+    int tmp = n;
+    long double res = 1;
+    while (tmp) {
+        res *= (double) tmp / (tmp - 0.5);
+        tmp--;
     }
-    return an;
+    res /= sqrt(n);
+    return res *= res;
 }
 
-double lim_pi(double eps){
-    double n = 1;
-    double an   = pow((pow(2, n)*fact(n)), 4)/(n*pow(fact(2*n), 2.0));
-    double an_1 = pow((pow(2, n+1)*fact(n+1)), 4)/((n+1)*pow(fact(2*(n+1)), 2));
-    while(eps < fabs(an_1 - an)){
-        n = n + 1;
-        an  =  an_1;
-        an_1 =  pow((pow(2, n+1)*fact(n+1)), 4)/((n+1)*pow(fact(2*(n+1)), 2));
-    }
-    return an;
+long double ln2Lim(int n) {
+    return n * (pow(2, 1.0 / n) - 1);
 }
-double lim_ln(double eps)
-{
-    double n = 1;
-    double an = n*(pow(2, 1/n)-1);
-    double an_1 = (n+1)*(pow(2, 1/(n+1))-1);
-    while(eps < fabs(an_1 - an)){
-        n   =  n + 1;
-        an  =  an_1;
-        an_1=  (n+1)*(pow(2, 1/(n+1))-1);
+
+long double sqrt2Lim(double eps) {
+    int i = 0, j;
+    long double res = -0.5, prevRes = 0;
+    eps *= eps;
+
+    while (fabs(res - prevRes) > eps || prevRes == 0) {
+        prevRes = res;
+        res = res - ((res * res) / 2) + 1;
     }
-    return an;
+
+    return res;
 }
-double lim_sqr(double eps){
-    double an = -0.5;
-    double an_1 = an-pow(an, 2)/2+1;
-    while(eps < fabs(an_1 - an)){
-        an = an_1;
-        an_1 = an-pow(an, 2)/2+1;
+
+long double eulerLim(int n) {
+    long double sum = 0;
+    for (int k = 1; k <= n; k++) {
+        sum += 1.0 / k;
     }
-    return an;
+    return -log(n) + sum;
 }
-double summ(double m)
-{
-    double k = 1;
-    double sum = 0;
-    while (k <= m){
-        sum += (fact(m)/(fact(m-k)*fact(k)))*(pow(-1, k)/k)*log(fact(k));
-        k++;
+
+long double eRow(int n) {
+    return 1.0 / factorial(n);
+}
+
+long double piRow(int n) {
+    return 4 * pow(-1.0, n - 1) / (2.0 * n - 1);
+}
+
+long double ln2Row(int n) {
+    return pow(-1.0, n - 1) / n;
+}
+
+long double sqrt2Multipl(int k) {
+    return pow(2, pow(2, -k));
+}
+
+long double gammaRow(double eps, int start) {
+    long double res = 0, epsFunc = 1e-15, prevRes = 0, funcReturned = 0;
+    for (start; (fabs(res - prevRes) > epsFunc || fabs(prevRes) < eps || (res - prevRes == 0)); start++) {
+        prevRes = res;
+        funcReturned = 1.0 / pow(floor(sqrt(start)), 2) - 1.0 / start;
+        res += funcReturned;
     }
-    return sum;
+    return res;
 }
-double lim_gamma(double eps)
-{
-    double n = 1;
-    double an = summ(n);
-    double an_1 = summ(n+1);
-    while(eps < fabs(an_1 - an)){
-        n = n + 1;
-        an =  an_1;
-        an_1 = summ(n+1);
+
+double equationDichotomy(double equation(double x), double a, double b, double eps) {
+    double functResultMiddle;
+    while (fabs(a - b) > eps) {
+        functResultMiddle = equation((a + b) / 2);
+        if (equation(a) * functResultMiddle > 0) {
+            a = (a + b) / 2;
+        }
+
+        if (equation(b) * functResultMiddle > 0) {
+            b = (a + b) / 2;
+        }
     }
-    return an;
+    return (a + b) / 2;
 }
-double sum_e(double eps)
-{
-    double cur = 1;
-    double sum = 0;
-    double n = 0;
-    while(fabs(cur) >= eps)
-    {
-        cur =  1/fact(n);
-        sum += cur;
-        n++;
-    }
-    return sum;
-}
-double sum_pi(double eps)
-{
-    double cur = 1;
-    double sum = 0;
-    double n = 1;
-    while(fabs(cur) >= eps)
-    {
-        cur =  pow(-1, n-1)/(2*n-1);
-        sum += cur;
-        n++;
-    }
-    return 4*sum;
-}
-double sum_ln(double eps)
-{
-    double cur = 1;
-    double sum = 0;
-    double n = 1;
-    while(fabs(cur) >= eps)
-    {
-        cur =  pow(-1, n-1)/n;
-        sum += cur;
-        n++;
-    }
-    return sum;
-}
-double mult_sqr(double eps)
-{
-    double cur = 1;
-    double mult = 1;
-    double n = 2;
-    while(n <= 1000)
-    {
-        cur =  pow(2, pow(2, n*(-1)));
-        mult *= cur;
-        n++;
-    }
-    return mult;
-}
-double sum_gamma(double eps)
-{
-    double cur = 1;
-    double sum = 0;
-    double n = 2;
-    while(fabs(cur) >= eps)
-    {
-        cur =  (1/pow((int)sqrt(n), 2))-(1/n);
-        sum += cur;
-        n++;
-    }
-    double a = sum_pi(eps);
-    return sum-((a*a)/6);
-}
-double f_e(double x)
-{
+
+double eEquation(double x) {
     return log(x) - 1;
 }
-double f_pi(double x)
-{
-    return cos(x) + 1;
+
+double piEquation(double x) {
+    return -sin(x);
 }
-double f_ln(double x)
-{
-    return exp(x) - 2;
+
+double ln2Equation(double x) {
+    return pow(2.718, x) - 2;
 }
-double f_sqr(double x)
-{
-    return pow(x, 2) - 2;
+
+double sqrt2Equation(double x) {
+    return x * x - 2;
 }
-double mult_gamma(double t)
-{
-    int p =1;
-    double mult = 1;
-    while(p <= t)
-    {
-        if (isPrime(p))
-        {
-            mult *= (p-1)/p;
+
+void simpleNumsGenerate(long **simpleNums, unsigned long long toGenerate, unsigned long long *generated) {
+    int count = 0;
+    long *tmp = NULL, i, j, *arraySieve = NULL;
+
+    if (!(arraySieve = (long *) calloc((toGenerate + 1), sizeof(long)))) {
+        return;
+    }
+    for (i = 2; i <= toGenerate; i++) {
+        if (!arraySieve[i]) {
+            count++;
+            for (j = i + i; j <= toGenerate; j += i) {
+                arraySieve[j] = 1;
+            }
         }
-        p++;
     }
-    return mult;
-}
-double f_gamma(double x, double eps)
-{
-    double t = 0;
-    double an   = log(t)*mult_gamma(t);
-    double an_1 = log(t+1)*mult_gamma(t+1);
-    while(eps < fabs(an_1 - an))
-    {
-        t   =  t + 1;
-        an  =  an_1;
-        an_1=  log(t+1)*mult_gamma(t+1);
+    if ((*simpleNums == NULL || (*generated) == 0)) {
+        if (!((*simpleNums) = (long *) calloc(count, sizeof(long)))) {
+            free(arraySieve);
+            return;
+        }
+    } else {
+        if (!(tmp = (long *) realloc((*simpleNums), sizeof(long) * (count + (*generated))))) {
+            free(arraySieve);
+            free(*simpleNums);
+            return;
+        }
+        (*simpleNums) = tmp;
     }
-    return exp(x*(-1)) - an;
-}
-double count_gamma(double eps)
-{
-    double l = -1, r = 1, c;
-    while( r - l > eps )
-    {
-        c = ( l + r ) / 2;
-        if(f_gamma(c, eps) * f_gamma(r, eps) < 0)
-            l = c;
-        else
-            r = c;
+    i = (!(*generated) ? 2 : (*simpleNums)[(*generated) - 1] + 1);
+    for (i; i <= toGenerate; i++) {
+        if (!arraySieve[i]) {
+            (*simpleNums)[(*generated)++] = i;
+        }
     }
-    return (l + r)/2;
-}
-double count_e(double eps)
-{
-    double l = 0, r = 3, c;
-    while( r - l > eps )
-    {
-        c = ( l + r ) / 2;
-        if(f_e(c) * f_e(r) < 0)
-            l = c;
-        else
-            r = c;
-    }
-    return (l + r)/2;
+    free(arraySieve);
 }
 
-double count_pi(double eps)
-{
-    double l = 3, r = 3.5, c;
-    while( r - l > eps )
-    {
-        c = ( l + r ) / 2;
-        if(f_pi(c) * f_pi(r) < 0)
-            l = c;
-        else
-            r = c;
+double eulerEquation(double eps) {
+    double result = 1, prevResult = 0;
+    int step = 1.0 / eps / 100;
+    long *simpleNums = NULL;
+    unsigned long long t = 1.0 / eps / eps, generated = 0, i;
+    for (t; fabs(result - prevResult) > eps; t += step) {
+        prevResult = result;
+        result = 1;
+        simpleNumsGenerate(&simpleNums, t, &generated);
+        for (i = 0; i < generated; i++) {
+            result *= (double) (simpleNums[i] - 1) / simpleNums[i];
+        }
+        result *= log(t);
+        result = -log(result);
     }
-    return (l + r)/2;
-}
-double count_ln(double eps)
-{
-    double l = 0, r = 1, c;
-    while( r - l > eps )
-    {
-        c = ( l + r ) / 2;
-        if(f_ln(c) * f_ln(l) > 0)
-            l = c;
-        else
-            r = c;
-    }
-    return (l + r)/2;
-}
-double count_sqr(double eps)
-{
-    double l = 0, r = 2, c;
-    while( r - l > eps )
-    {
-        c = ( l + r ) / 2;
-        if(f_sqr(c) * f_sqr(r) < 0)
-            l = c;
-        else
-            r = c;
-    }
-    return (l + r)/2;
+    free(simpleNums);
+    return result;
 }
 
-int main()
-{
-    double eps = 0;
-    printf("\nEnter accuracy (eps) :\n");
-    scanf("%lf",&eps);
-    printf("e = %.10lf\n",lim_e(eps));
-    printf("pi = %.10lf\n",lim_pi(eps));
-    printf("ln2 = %.10lf\n",lim_ln(eps));
-    printf("sqr(2) = %.10lf\n",lim_sqr(eps));
-    printf("gamma = %.10lf\n\n",lim_gamma(0.0001));
-    printf("e = %.10lf\n",sum_e(eps));
-    printf("pi = %.10lf\n",sum_pi(eps));
-    printf("ln2 = %.10lf\n",sum_ln(eps));
-    printf("sqr(2) = %.10lf\n",mult_sqr(eps));
-    printf("gamma = %.10lf\n\n",sum_gamma(eps));
-    printf("e = %.10lf\n",count_e(eps));
-    printf("pi = %.10lf\n",count_pi(eps));
-    printf("ln2 = %.10lf\n",count_ln(eps));
-    printf("sqr(2) = %.10lf\n",count_sqr(eps));
-    printf("gamma = %.10lf\n",count_gamma(eps));
+int main() {
+    printf("\nEnter a power of accuracy:\n");
+    int l;
+    if(!scanf("%d", &l)){
+        printf("\nWrong input!\n");
+        return 0;
+    }
+    if(l < 0){
+        printf("\nWrong accuracy!\n");
+        return 0;
+    }
+    double eps = pow(10, -l);
+    printf("\nAccuracy: %f\n\n", eps);
+
+    printf("e:\n");
+    printf("limit: %.*Lf\n", l, limit(eLim, eps));
+    printf("row sum: %.*Lf\n", l, sum(eRow, eps, 0));
+    printf("equation: %.*lf\n\n", l, equationDichotomy(eEquation, 2., 3., eps));
+
+    printf("pi:\n");
+    printf("limit: %.*Lf\n", l, limit(piLim, eps));
+    printf("row sum: %.*Lf\n", l, sum(piRow, eps, 1));
+    printf("equation: %.*lf\n\n", l, equationDichotomy(piEquation, 3, 3.5, eps));
+
+    printf("ln(2):\n");
+    printf("limit: %.*Lf\n", l, limit(ln2Lim, eps));
+    printf("row sum: %.*Lf\n", l, sum(ln2Row, eps, 1));
+    printf("equation: %.*lf\n\n", l, equationDichotomy(ln2Equation, 0, 1, eps));
+
+    printf("sqrt(2):\n");
+    printf("limit: %.*Lf\n", l, sqrt2Lim(eps));
+    printf("row multi: %.*Lf\n", l, multipl(sqrt2Multipl, eps, 2));
+    printf("equation: %.*lf\n\n", l, equationDichotomy(sqrt2Equation, 1, 2, eps));
+
+    printf("Gamma:\n");
+    printf("limit: %.*Lf\n", l, limit(eulerLim, eps));
+    printf("row sum: %.*Lf\n", l, gammaRow(eps, 2) - 3.14*3.14 / 6);
+    printf("equation: %.*lf\n\n", l, eulerEquation(eps));
 
     return 0;
 }
